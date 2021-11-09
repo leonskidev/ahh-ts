@@ -32,7 +32,10 @@ export type Option<T> = Some<T> | None;
  *
  * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
  */
-export const Some = <T>(value: T): Option<T> => ({ _tag: "some", value });
+export function Some<T>(value: T): Option<T> {
+  return { _tag: "some", value };
+}
+
 /**
  * Represents a [`None`].
  *

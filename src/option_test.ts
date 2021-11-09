@@ -167,13 +167,23 @@ Deno.test(
   "flatten",
   async (t) => {
     await t.step(
-      "two_deep",
+      "two_deep_some",
       () => assertEquals(flatten(Some(Some(1))), Some(1)),
     );
 
     await t.step(
-      "three_deep",
+      "two_deep_none",
+      () => assertEquals(flatten(Some(None)), None),
+    );
+
+    await t.step(
+      "three_deep_some",
       () => assertEquals(flatten(Some(Some(Some(1)))), Some(Some(1))),
+    );
+
+    await t.step(
+      "three_deep_none",
+      () => assertEquals(flatten(Some(Some(None))), Some(None)),
     );
   },
 );

@@ -14,8 +14,8 @@ export type None = {
  * Represents an optional value that either exists ([`Some`]) or does not
  * ([`None`]).
  *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
- * [`None`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#None
+ * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
+ * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
  */
 export type Option<T> = Some<T> | None;
 
@@ -30,7 +30,7 @@ export type Option<T> = Some<T> | None;
  * const one = Some(1);
  * ```
  *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
+ * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
  */
 export const Some = <T>(value: T): Option<T> => ({ _tag: "some", value });
 /**
@@ -47,7 +47,7 @@ export const Some = <T>(value: T): Option<T> => ({ _tag: "some", value });
  * const none = None;
  * ```
  *
- * [`None`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#None
+ * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
  */
 export const None: Option<never> = { _tag: "none" };
 
@@ -63,8 +63,8 @@ export const Option = {
    * const t = Option.isSome(Some(1));
    * ```
    *
-   * [`Option`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Option
-   * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
+   * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
+   * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
    */
   isSome: <T>(option: Option<T>): boolean => option._tag === "some",
 
@@ -79,8 +79,8 @@ export const Option = {
    * const t = Option.isNone(None);
    * ```
    *
-   * [`Option`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Option
-   * [`None`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#None
+   * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
+   * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
    */
   isNone: <T>(option: Option<T>): boolean => option._tag === "none",
 
@@ -99,9 +99,9 @@ export const Option = {
    * const one = Option.expect(Some(1), "does not throw");
    * ```
    *
-   * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
-   * [`Option`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Option
-   * [`None`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#None
+   * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
+   * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
+   * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
    */
   expect: <T>(option: Option<T>, message: string): T => {
     if (option._tag === "some") {
@@ -128,12 +128,12 @@ export const Option = {
    * const one = Option.unwrap(Some(1));
    * ```
    *
-   * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
-   * [`Option`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Option
-   * [`None`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#None
+   * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
+   * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
+   * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
    *
-   * [`unwrapOr`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#unwrapOr
-   * [`unwrapOrElse`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#unwrapOrElse
+   * [`unwrapOr`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#unwrapOr
+   * [`unwrapOrElse`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#unwrapOrElse
    */
   unwrap: <T>(option: Option<T>): T => {
     if (option._tag === "some") {
@@ -154,7 +154,7 @@ export const Option = {
    * const b = Option.and(Some(1), Some(2));
    * ```
    *
-   * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
+   * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
    */
   and: <T, U>(a: Option<T>, b: Option<U>): Option<U> => {
     if (a._tag === "some" && b._tag === "some") {
@@ -175,7 +175,7 @@ export const Option = {
    * const a = Option.or(Some(1), Some(2));
    * ```
    *
-   * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
+   * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
    */
   or: <T>(a: Option<T>, b: Option<T>): Option<T> => {
     if (a._tag === "some") {
@@ -198,7 +198,7 @@ export const Option = {
    * const a = Option.xor(None, Some(2));
    * ```
    *
-   * [`Some`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Some
+   * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
    */
   xor: <T>(a: Option<T>, b: Option<T>): Option<T> => {
     if (a._tag === "some" && b._tag === "none") {
@@ -221,7 +221,7 @@ export const Option = {
    * const one = Option.flatten(Some(Some(1)));
    * ```
    *
-   * [`Option`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Option
+   * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
    */
   flatten: <T>(option: Option<Option<T>>): Option<T> => {
     if (option._tag === "some") {
@@ -243,7 +243,7 @@ export const Option = {
    * const two = Option.map(Some(1), (num) => num + 1);
    * ```
    *
-   * [`Option`]: https://doc.deno.land/https/deno.land/x/or/src/option.ts#Option
+   * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
    */
   map: <T, U>(option: Option<T>, f: (_: T) => U): Option<U> => {
     if (option._tag === "some") {

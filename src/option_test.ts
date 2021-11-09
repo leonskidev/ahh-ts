@@ -1,5 +1,17 @@
 import { assertEquals, assertThrows } from "../deps.ts";
-import { None, Option, Some } from "./option.ts";
+import {
+  and,
+  expect,
+  flatten,
+  isNone,
+  isSome,
+  map,
+  None,
+  or,
+  Some,
+  unwrap,
+  xor,
+} from "./option.ts";
 
 Deno.test(
   "some",
@@ -16,12 +28,12 @@ Deno.test(
   async (t) => {
     await t.step(
       "some",
-      () => assertEquals(Option.isSome(Some(1)), true),
+      () => assertEquals(isSome(Some(1)), true),
     );
 
     await t.step(
       "none",
-      () => assertEquals(Option.isSome(None), false),
+      () => assertEquals(isSome(None), false),
     );
   },
 );
@@ -31,12 +43,12 @@ Deno.test(
   async (t) => {
     await t.step(
       "some",
-      () => assertEquals(Option.isNone(Some(1)), false),
+      () => assertEquals(isNone(Some(1)), false),
     );
 
     await t.step(
       "none",
-      () => assertEquals(Option.isNone(None), true),
+      () => assertEquals(isNone(None), true),
     );
   },
 );
@@ -46,13 +58,12 @@ Deno.test(
   async (t) => {
     await t.step(
       "some",
-      () => assertEquals(Option.expect(Some(1), "ok"), 1),
+      () => assertEquals(expect(Some(1), "ok"), 1),
     );
 
     await t.step(
       "none",
-      () =>
-        assertThrows(() => Option.expect(None, "failed"), TypeError, "failed"),
+      () => assertThrows(() => expect(None, "failed"), TypeError, "failed"),
     );
   },
 );
@@ -62,16 +73,16 @@ Deno.test(
   async (t) => {
     await t.step(
       "some",
-      () => assertEquals(Option.unwrap(Some(1)), 1),
+      () => assertEquals(unwrap(Some(1)), 1),
     );
 
     await t.step(
       "none",
       () =>
         assertThrows(
-          () => Option.unwrap(None),
+          () => unwrap(None),
           TypeError,
-          "called `Option.unwrap()` on a `None`",
+          "called `unwrap()` on a `None`",
         ),
     );
   },
@@ -82,22 +93,22 @@ Deno.test(
   async (t) => {
     await t.step(
       "a_b",
-      () => assertEquals(Option.and(Some(1), Some(2)), Some(2)),
+      () => assertEquals(and(Some(1), Some(2)), Some(2)),
     );
 
     await t.step(
       "a_not_b",
-      () => assertEquals(Option.and(Some(1), None), None),
+      () => assertEquals(and(Some(1), None), None),
     );
 
     await t.step(
       "not_a_b",
-      () => assertEquals(Option.and(None, Some(2)), None),
+      () => assertEquals(and(None, Some(2)), None),
     );
 
     await t.step(
       "not_a_not_b",
-      () => assertEquals(Option.and(None, None), None),
+      () => assertEquals(and(None, None), None),
     );
   },
 );
@@ -107,22 +118,22 @@ Deno.test(
   async (t) => {
     await t.step(
       "a_b",
-      () => assertEquals(Option.or(Some(1), Some(2)), Some(1)),
+      () => assertEquals(or(Some(1), Some(2)), Some(1)),
     );
 
     await t.step(
       "a_not_b",
-      () => assertEquals(Option.or(Some(1), None), Some(1)),
+      () => assertEquals(or(Some(1), None), Some(1)),
     );
 
     await t.step(
       "not_a_b",
-      () => assertEquals(Option.or(None, Some(2)), Some(2)),
+      () => assertEquals(or(None, Some(2)), Some(2)),
     );
 
     await t.step(
       "not_a_not_b",
-      () => assertEquals(Option.or(None, None), None),
+      () => assertEquals(or(None, None), None),
     );
   },
 );
@@ -132,22 +143,22 @@ Deno.test(
   async (t) => {
     await t.step(
       "a_b",
-      () => assertEquals(Option.xor(Some(1), Some(2)), None),
+      () => assertEquals(xor(Some(1), Some(2)), None),
     );
 
     await t.step(
       "a_not_b",
-      () => assertEquals(Option.xor(Some(1), None), Some(1)),
+      () => assertEquals(xor(Some(1), None), Some(1)),
     );
 
     await t.step(
       "not_a_b",
-      () => assertEquals(Option.xor(None, Some(2)), Some(2)),
+      () => assertEquals(xor(None, Some(2)), Some(2)),
     );
 
     await t.step(
       "not_a_not_b",
-      () => assertEquals(Option.xor(None, None), None),
+      () => assertEquals(xor(None, None), None),
     );
   },
 );
@@ -157,12 +168,12 @@ Deno.test(
   async (t) => {
     await t.step(
       "two_deep",
-      () => assertEquals(Option.flatten(Some(Some(1))), Some(1)),
+      () => assertEquals(flatten(Some(Some(1))), Some(1)),
     );
 
     await t.step(
       "three_deep",
-      () => assertEquals(Option.flatten(Some(Some(Some(1)))), Some(Some(1))),
+      () => assertEquals(flatten(Some(Some(Some(1)))), Some(Some(1))),
     );
   },
 );
@@ -172,12 +183,12 @@ Deno.test(
   async (t) => {
     await t.step(
       "some",
-      () => assertEquals(Option.map(Some(1), (num) => num + 1), Some(2)),
+      () => assertEquals(map(Some(1), (num) => num + 1), Some(2)),
     );
 
     await t.step(
       "none",
-      () => assertEquals(Option.map(None, (num) => num + 1), None),
+      () => assertEquals(map(None, (num) => num + 1), None),
     );
   },
 );

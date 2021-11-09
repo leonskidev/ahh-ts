@@ -165,7 +165,7 @@ export function and<T, U>(a: Option<T>, b: Option<U>): Option<U> {
 }
 
 /**
- * Returns `a` or `b` if it is [`Some`].
+ * Returns `a` or `b` if one of them is [`Some`].
  *
  * ## Example
  *

@@ -12,7 +12,8 @@ Deno.test("is_none", async (t) => {
 });
 
 Deno.test("contains", async (t) => {
-  await t.step("some", () => assertEquals(Some(1).contains(1), true));
+  await t.step("some_true", () => assertEquals(Some(1).contains(1), true));
+  await t.step("some_false", () => assertEquals(Some(1).contains(0), false));
   await t.step("none", () => assertEquals(None().contains(1), false));
 });
 

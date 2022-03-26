@@ -271,7 +271,7 @@ class NoneImpl<T> implements Option<T> {
   }
 
   expect(message: string): T {
-    throw Error(message);
+    throw new Error(message);
   }
 
   unwrap(): T {

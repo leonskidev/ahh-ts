@@ -5,10 +5,10 @@ work with &mdash; if you don't mind a little verbosity.
 
 ## Example
 
-This is an example on how you might use [`result.ts`](./result.ts):
+This is an example on how you might use results:
 
 ```ts
-import { Err, Ok, Result } from "./result.ts";
+import { Err, Ok, Result } from "./mod.ts";
 
 function mustStartWith(s: string, start: string): Result<string, string> {
   if (s.startsWith(start)) {

@@ -5,6 +5,7 @@
  *
  * ```ts
  * import { Some } from "./option.ts";
+ *
  * const num = Some(1);
  * ```
  */
@@ -19,6 +20,7 @@ export function Some<T>(value: T): Option<T> {
  *
  * ```ts
  * import { None } from "./option.ts";
+ *
  * const unk = None();
  * const num = None<number>();
  * ```

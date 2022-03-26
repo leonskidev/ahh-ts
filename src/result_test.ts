@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "./test_deps.ts";
+import { assertEquals, assertThrows } from "../test_deps.ts";
 import { Err, Ok } from "./result.ts";
 
 Deno.test("is_ok", async (t) => {

@@ -1,30 +1,9 @@
-/**
- * Represents a value that exists.
- *
- * ## Examples
- *
- * ```ts
- * import { Some } from "./option.ts";
- *
- * const num = Some(1);
- * ```
- */
+/** Represents a value that exists. */
 export function Some<T>(value: T): Option<T> {
   return new SomeImpl<T>(value);
 }
 
-/**
- * Represents a value that does not exist.
- *
- * ## Examples
- *
- * ```ts
- * import { None } from "./option.ts";
- *
- * const unk = None();
- * const num = None<number>();
- * ```
- */
+/** Represents a value that does not exist. */
 export function None<T>(): Option<T> {
   return new NoneImpl<T>();
 }
@@ -33,158 +12,44 @@ export function None<T>(): Option<T> {
  * Represents an optional value that either exists ({@linkcode Some}) or does
  * not exist ({@linkcode None}).
  */
-export type Option<T> = {
-  /**
-   * Returns `true` if the `Option` is {@linkcode Some}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * Some(1).isSome() === true;
-   * None().isSome() === false;
-   * ```
-   */
+export interface Option<T> {
+  /** Returns `true` if the `Option` is {@linkcode Some}. */
   isSome(): boolean;
 
-  /**
-   * Returns `true` if the `Option` is {@linkcode None}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * Some(1).isNone() === false;
-   * None().isNone() === true;
-   * ```
-   */
+  /** Returns `true` if the `Option` is {@linkcode None}. */
   isNone(): boolean;
 
   /**
    * Returns `true` of the `Option` is a {@linkcode Some} containing `value`.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * Some(1).contains(1) === true;
-   * None().contains(1) === false;
-   * ```
    */
   contains<U extends T>(value: U): boolean;
 
   /**
    * Returns the contained {@linkcode Some} value.
    *
-   * ## Throws
-   *
    * Throws if the `Option` is a {@linkcode None} with the provided `message`.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * Some(1).expect("returns") === 1;
-   * None().expect("throws") === 1;
-   * ```
    */
   expect(message: string): T;
 
   /**
    * Returns the contained {@linkcode Some} value.
    *
-   * ## Throws
-   *
    * Throws if the `Option` is a {@linkcode None}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * Some(1).unwrap() === 1;
-   * None().unwrap() === 1; // throws
-   * ```
    */
   unwrap(): T;
 
-  /**
-   * Returns a new `Option` where the value is mapped with `fn`.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * Some(1).map((v) => v + 1).contains(2) === true;
-   * None<number>().map((v) => v + 1).contains(2) === false;
-   * ```
-   */
+  /** Returns a new `Option` where the value is mapped with `fn`. */
   map<U>(fn: ((_: T) => U)): Option<U>;
 
-  /**
-   * Returns `other` if this and `other` are {@linkcode Some}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * const one = Some(1);
-   * const two = Some(2);
-   * const none = None<number>();
-   *
-   * one.and(two) === two;
-   * one.and(none).isNone() === true;
-   * none.and(two).isNone() === true;
-   * none.and(none).isNone() === true;
-   * ```
-   */
+  /** Returns `other` if this and `other` are {@linkcode Some}. */
   and<U>(other: Option<U>): Option<U>;
 
-  /**
-   * Returns this or `other` if either is {@linkcode Some}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * const one = Some(1);
-   * const two = Some(2);
-   * const none = None<number>();
-   *
-   * one.or(two) === one;
-   * one.or(none) === one;
-   * none.or(two) === two;
-   * none.or(none).isNone() === true;
-   * ```
-   */
+  /** Returns this or `other` if either is {@linkcode Some}. */
   or(other: Option<T>): Option<T>;
 
-  /**
-   * Returns this or `other` if only one is {@linkcode Some}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { None, Some } from "./option.ts";
-   *
-   * const one = Some(1);
-   * const two = Some(2);
-   * const none = None<number>();
-   *
-   * one.or(two).isNone === true;
-   * one.or(none) === one;
-   * none.or(two) === two;
-   * none.or(none).isNone() === true;
-   */
+  /** Returns this or `other` if only one is {@linkcode Some}. */
   xor(other: Option<T>): Option<T>;
-};
+}
 
 class SomeImpl<T> implements Option<T> {
   #value: T;

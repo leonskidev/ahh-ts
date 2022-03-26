@@ -184,21 +184,6 @@ export type Option<T> = {
    * none.or(none).isNone() === true;
    */
   xor(other: Option<T>): Option<T>;
-  // /**
-  //  * Returns the nested `Option`.
-  //  *
-  //  * ## Examples
-  //  *
-  //  * ```ts
-  //  * import { None, Some, type Option } from "./option.ts";
-  //  *
-  //  * const one = Some(1);
-  //  *
-  //  * Some(one).flatten() === one;
-  //  * None<Option<number>>().flatten().isNone() === true;
-  //  * ```
-  //  */
-  // flatten(this: Option<Option<T>>): Option<T>;
 };
 
 class SomeImpl<T> implements Option<T> {
@@ -251,10 +236,6 @@ class SomeImpl<T> implements Option<T> {
       return None<T>();
     }
   }
-
-  // flatten(this: SomeImpl<Option<T>>): Option<T> {
-  //   return this.#value;
-  // }
 }
 
 class NoneImpl<T> implements Option<T> {
@@ -301,8 +282,4 @@ class NoneImpl<T> implements Option<T> {
       return None<T>();
     }
   }
-
-  // flatten(): Option<T> {
-  //   return None<T>();
-  // }
 }

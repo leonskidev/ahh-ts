@@ -1,233 +1,357 @@
-/** Represents a result value that was successful. */
-export type Ok<T> = {
-  readonly _tag: "ok";
-  /** The inner value. */
-  readonly value: T;
-};
-
-/** Represents a result value that was erroneous. */
-export type Err<E> = {
-  readonly _tag: "err";
-  /** The inner value. */
-  readonly value: E;
-};
-
 /**
- * Represents a result value that is either successful ([`Ok`]) or erroneous
- * ([`Err`]).
+ * Represents a value that is successful.
  *
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
- * [`Err`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Err
- */
-export type Result<T, E> = Ok<T> | Err<E>;
-
-/**
- * Creates an [`Ok`].
- *
- * ## Example
+ * ## Examples
  *
  * ```ts
  * import { Ok } from "./result.ts";
  *
- * const ok = Ok(1);
+ * const unk = Ok(1);
+ * const num = Ok<number, string>(1);
  * ```
- *
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
  */
 export function Ok<T, E>(value: T): Result<T, E> {
-  return { _tag: "ok", value };
+  return new OkImpl<T, E>(value);
 }
 
 /**
- * Creates an [`Err`].
+ * Represents a value that is erroneous.
  *
- * ## Example
+ * ## Examples
  *
  * ```ts
  * import { Err } from "./result.ts";
  *
- * const err = Err("whoops");
+ * const unk = Err(1);
+ * const num = Err<string, number>(1);
  * ```
- *
- * [`Err`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Err
  */
 export function Err<T, E>(value: E): Result<T, E> {
-  return { _tag: "err", value };
+  return new ErrImpl<T, E>(value);
 }
 
 /**
- * Returns `true` if the [`Result`] is [`Ok`].
- *
- * ## Example
- *
- * ```ts
- * import { Ok, isOk } from "./result.ts";
- *
- * const t = isOk(Ok(1));
- * ```
- *
- * [`Result`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Result
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
+ * Represents a result value that is either successful ({@linkcode Ok}) or
+ * erroneous ({@linkcode Err}).
  */
-export function isOk<T, E>(result: Result<T, E>): boolean {
-  return result._tag === "ok";
-}
+export type Result<T, E> = {
+  /**
+   * Returns `true` if the `Result` is {@linkcode Ok}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).isOk() === true;
+   * Err(1).isOk() === false;
+   * ```
+   */
+  isOk(): boolean;
 
-/**
- * Returns `true` if the [`Result`] is [`Err`].
- *
- * ## Example
- *
- * ```ts
- * import { Err, isErr } from "./result.ts";
- *
- * const t = isErr(Err(1));
- * ```
- *
- * [`Result`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Result
- * [`Err`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Err
- */
-export function isErr<T, E>(result: Result<T, E>): boolean {
-  return result._tag === "err";
-}
+  /**
+   * Returns `true` if the `Result` is {@linkcode Err}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).isErr() === false;
+   * Err(1).isErr() === true;
+   * ```
+   */
+  isErr(): boolean;
 
-/**
- * Returns the contained [`Ok`] value.
- *
- * ## Throws
- *
- * Throws if the [`Result`] is an [`Err`] with the provided `message`.
- *
- * ## Example
- *
- * ```ts
- * import { Ok, expect } from "./result.ts";
- *
- * const one = expect(Ok(1), "does not throw");
- * ```
- *
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
- * [`Result`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Result
- * [`Err`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Err
- */
-export function expect<T, E>(result: Result<T, E>, message: string): T {
-  if (result._tag === "ok") {
-    return result.value;
-  } else {
-    throw TypeError(`${message}: ${result.value}`);
+  /**
+   * Returns `true` of the `Result` is an {@linkcode Ok} containing `value`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).contains(1) === true;
+   * Err(1).contains(1) === false;
+   * ```
+   */
+  contains<U extends T>(value: U): boolean;
+
+  /**
+   * Returns `true` of the `Result` is an {@linkcode Err} containing `value`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).containsErr(1) === false;
+   * Err(1).containsErr(1) === true;
+   * ```
+   */
+  containsErr<F extends E>(value: F): boolean;
+
+  /**
+   * Returns the contained {@linkcode Ok} value.
+   *
+   * ## Throws
+   *
+   * Throws if the `Result` is an {@linkcode Err} with the provided `message`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).expect("returns") === 1;
+   * Err(1).expect("throws") === 1;
+   * ```
+   */
+  expect(message: string): T;
+
+  /**
+   * Returns the contained {@linkcode Err} value.
+   *
+   * ## Throws
+   *
+   * Throws if the `Result` is an {@linkcode Ok} with the provided `message`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).expect("throws") === 1;
+   * Err(1).expect("returns") === 1;
+   * ```
+   */
+  expectErr(message: string): E;
+
+  /**
+   * Returns the contained {@linkcode Ok} value.
+   *
+   * ## Throws
+   *
+   * Throws if the `Result` is an {@linkcode Err}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).unwrap() === 1;
+   * Err(1).unwrap() === 1; // throws
+   * ```
+   */
+  unwrap(): T;
+
+  /**
+   * Returns the contained {@linkcode Err} value.
+   *
+   * ## Throws
+   *
+   * Throws if the `Result` is an {@linkcode Ok}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).unwrap() === 1; // throws
+   * Err(1).unwrap() === 1;
+   * ```
+   */
+  unwrapErr(): E;
+
+  /**
+   * Returns a new `Result` where the {@linkcode Ok} value is mapped with `fn`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok(1).map((v) => v + 1).contains(2) === true;
+   * Err<number, number>(1).map((v) => v + 1).contains(2) === false;
+   * ```
+   */
+  map<U>(fn: ((_: T) => U)): Result<U, E>;
+
+  /**
+   * Returns a new `Result` where the {@linkcode Err} value is mapped with `fn`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * Ok<number, number>(1).mapErr((v) => v + 1).containsErr(2) === false;
+   * Err(1).mapErr((v) => v + 1).containsErr(2) === true;
+   * ```
+   */
+  mapErr<F>(fn: ((_: E) => F)): Result<T, F>;
+
+  /**
+   * Returns `other` if this and `other` are {@linkcode Ok}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * const one = Ok<number, number>(1);
+   * const two = Ok<number, number>(2);
+   * const err = Err(1);
+   *
+   * one.and(two) === two;
+   * one.and(err).isErr() === true;
+   * err.and(two).isErr() === true;
+   * err.and(err).isErr() === true;
+   * ```
+   */
+  and<U>(other: Result<U, E>): Result<U, E>;
+
+  /**
+   * Returns this or `other` if either is {@linkcode Ok}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { Err, Ok } from "./result.ts";
+   *
+   * const one = Ok(1);
+   * const two = Ok(2);
+   * const err = Err<number, number>(1);
+   *
+   * one.or(two) === one;
+   * one.or(err) === one;
+   * err.or(two) === two;
+   * err.or(err).isErr() === true;
+   * ```
+   */
+  or<F>(other: Result<T, F>): Result<T, F>;
+};
+
+class OkImpl<T, E> implements Result<T, E> {
+  #value: T;
+
+  constructor(value: T) {
+    this.#value = value;
+  }
+
+  isOk(): boolean {
+    return true;
+  }
+
+  isErr(): boolean {
+    return false;
+  }
+
+  contains<U extends T>(value: U): boolean {
+    return this.#value === value;
+  }
+
+  containsErr<F extends E>(): boolean {
+    return false;
+  }
+
+  expect(): T {
+    return this.#value;
+  }
+
+  expectErr(message: string): E {
+    throw new Error(`${message}: ${this.#value}`);
+  }
+
+  unwrap(): T {
+    return this.expect();
+  }
+
+  unwrapErr(): E {
+    return this.expectErr("called `Result.unwrapErr()` on an `Ok` value");
+  }
+
+  map<U>(fn: ((_: T) => U)): Result<U, E> {
+    return Ok<U, E>(fn(this.#value));
+  }
+
+  mapErr<F>(): Result<T, F> {
+    return Ok<T, F>(this.#value);
+  }
+
+  and<U>(other: Result<U, E>): Result<U, E> {
+    if (other.isOk()) {
+      return other;
+    } else {
+      // NOTE: this is safe since we check above that `other` is not `Ok`
+      // FIXME: this might not be exactly what should happen
+      return Err<U, E>(other.unwrapErr());
+    }
+  }
+
+  or<F>(): Result<T, F> {
+    return Ok<T, F>(this.#value);
   }
 }
 
-/**
- * Returns the contained [`Ok`] value.
- *
- * ## Throws
- *
- * Throws if the [`Result`] is an [`Err`].
- *
- * ## Example
- *
- * ```ts
- * import { Ok, unwrap } from "./result.ts";
- *
- * const one = unwrap(Ok(1));
- * ```
- *
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
- * [`Result`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Result
- * [`Err`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Err
- */
-export function unwrap<T, E>(result: Result<T, E>): T {
-  return expect(
-    result,
-    "called `unwrap()` on an `Err`",
-  );
-}
+class ErrImpl<T, E> implements Result<T, E> {
+  #value: E;
 
-/**
- * Returns `b` if `a` and `b` are [`Ok`].
- *
- * ## Example
- *
- * ```ts
- * import { Ok, and } from "./result.ts";
- *
- * const b = and(Ok(1), Ok(2));
- * ```
- *
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
- */
-export function and<T, U, E>(a: Result<T, E>, b: Result<U, E>): Result<U, E> {
-  if (a._tag !== "ok") {
-    return a;
-  } else {
-    return b;
+  constructor(value: E) {
+    this.#value = value;
   }
-}
 
-/**
- * Returns `a` or `b` if one of them is [`Ok`].
- *
- * ## Example
- *
- * ```ts
- * import { Ok, or } from "./result.ts";
- *
- * const a = or(Ok(1), Ok(2));
- * ```
- *
- * [`Ok`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Ok
- */
-export function or<T, E, F>(a: Result<T, E>, b: Result<T, F>): Result<T, F> {
-  if (a._tag === "ok") {
-    return a;
-  } else {
-    return b;
+  isOk(): boolean {
+    return false;
   }
-}
 
-/**
- * Returns the nested [`Result`] in an `Result<Result<T>>`.
- *
- * ## Example
- *
- * ```ts
- * import { Ok, flatten } from "./result.ts"
- *
- * const one = flatten(Ok(Ok(1)));
- * ```
- *
- * [`Result`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Result
- */
-export function flatten<T, E>(result: Result<Result<T, E>, E>): Result<T, E> {
-  if (result._tag === "ok") {
-    return result.value;
-  } else {
-    return Err(result.value);
+  isErr(): boolean {
+    return true;
   }
-}
 
-/**
- * Returns a new [`Result`] of the provided [`Result`]s value mapped with
- * function `f`.
- *
- * ## Example
- *
- * ```ts
- * import { Ok, map } from "./result.ts";
- *
- * const two = map(Ok(1), (num) => num + 1);
- * ```
- *
- * [`Result`]: https://doc.deno.land/https/deno.land/x/ahh/src/result.ts#Result
- */
-export function map<T, U, E>(
-  result: Result<T, E>,
-  f: (_: T) => U,
-): Result<U, E> {
-  if (result._tag === "ok") {
-    return Ok(f(result.value));
-  } else {
-    return Err(result.value);
+  contains(): boolean {
+    return false;
+  }
+
+  containsErr<F extends E>(value: F): boolean {
+    return this.#value === value;
+  }
+
+  expect(message: string): T {
+    throw new Error(`${message}: ${this.#value}`);
+  }
+
+  expectErr(): E {
+    return this.#value;
+  }
+
+  unwrap(): T {
+    return this.expect("called `Result.unwrap()` on an `Err` value");
+  }
+
+  unwrapErr(): E {
+    return this.expectErr();
+  }
+
+  map<U>(): Result<U, E> {
+    return Err<U, E>(this.#value);
+  }
+
+  mapErr<F>(fn: ((_: E) => F)): Result<T, F> {
+    return Err<T, F>(fn(this.#value));
+  }
+
+  and<U>(): Result<U, E> {
+    return Err<U, E>(this.#value);
+  }
+
+  or<F>(other: Result<T, F>): Result<T, F> {
+    if (other.isOk()) {
+      return other;
+    } else {
+      // NOTE: this is safe since we check above that `other` is not `Ok`
+      // FIXME: this might not be exactly what should happen
+      return Err<T, F>(other.unwrapErr());
+    }
   }
 }

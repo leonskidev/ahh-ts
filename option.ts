@@ -1,254 +1,307 @@
-/** Represents an optional value that does exist. */
-export type Some<T> = {
-  readonly _tag: "some";
-  /** The inner value. */
-  readonly value: T;
-};
-
-/** Represents an optional value that does not exist. */
-export type None = {
-  readonly _tag: "none";
-};
-
 /**
- * Represents an optional value that either exists ([`Some`]) or does not
- * ([`None`]).
+ * Represents a value that exists.
  *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
- */
-export type Option<T> = Some<T> | None;
-
-/**
- * Creates a [`Some`].
- *
- * ## Example
+ * ## Examples
  *
  * ```ts
  * import { Some } from "./option.ts";
- *
- * const one = Some(1);
+ * const num = Some(1);
  * ```
- *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
  */
 export function Some<T>(value: T): Option<T> {
-  return { _tag: "some", value };
+  return new SomeImpl<T>(value);
 }
 
 /**
- * Represents a [`None`].
+ * Represents a value that does not exist.
  *
- * [`None`] does not need to be constructed as it represents the absence of a
- * value, and therefore, does not change.
- *
- * ## Example
+ * ## Examples
  *
  * ```ts
  * import { None } from "./option.ts";
- *
- * const none = None;
+ * const unk = None();
+ * const num = None<number>();
  * ```
- *
- * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
  */
-export const None: Option<never> = { _tag: "none" };
-
-/**
- * Returns `true` if the [`Option`] is [`Some`].
- *
- * ## Example
- *
- * ```ts
- * import { Some, isSome } from "./option.ts";
- *
- * const t = isSome(Some(1));
- * ```
- *
- * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- */
-export function isSome<T>(option: Option<T>): boolean {
-  return option._tag === "some";
+export function None<T>(): Option<T> {
+  return new NoneImpl<T>();
 }
 
 /**
- * Returns `true` if the [`Option`] is [`None`].
- *
- * ## Example
- *
- * ```ts
- * import { None, isNone } from "./option.ts";
- *
- * const t = isNone(None);
- * ```
- *
- * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
- * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
+ * Represents an optional value that either exists ({@linkcode Some}) or does
+ * not exist ({@linkcode None}).
  */
-export function isNone<T>(option: Option<T>): boolean {
-  return option._tag === "none";
-}
+export type Option<T> = {
+  /**
+   * Returns `true` if the `Option` is {@linkcode Some}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * Some(1).isSome() === true;
+   * None().isSome() === false;
+   * ```
+   */
+  isSome(): boolean;
 
-/**
- * Returns the contained [`Some`] value.
- *
- * ## Throws
- *
- * Throws if the [`Option`] is a [`None`] with the provided `message`.
- *
- * ## Example
- *
- * ```ts
- * import { Some, expect } from "./option.ts";
- *
- * const one = expect(Some(1), "does not throw");
- * ```
- *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
- * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
- */
-export function expect<T>(option: Option<T>, message: string): T {
-  if (option._tag === "some") {
-    return option.value;
-  } else {
-    throw TypeError(message);
+  /**
+   * Returns `true` if the `Option` is {@linkcode None}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * Some(1).isNone() === false;
+   * None().isNone() === true;
+   * ```
+   */
+  isNone(): boolean;
+
+  /**
+   * Returns `true` of the `Option` is a {@linkcode Some} containing `value`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * Some(1).contains(1) === true;
+   * None().contains(1) === false;
+   * ```
+   */
+  contains<U extends T>(value: U): boolean;
+
+  /**
+   * Returns the contained {@linkcode Some} value.
+   *
+   * ## Throws
+   *
+   * Throws if the `Option` is a {@linkcode None} with the provided `message`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * Some(1).expect("returns") === 1;
+   * None().expect("throws") === 1;
+   * ```
+   */
+  expect(message: string): T;
+
+  /**
+   * Returns the contained {@linkcode Some} value.
+   *
+   * ## Throws
+   *
+   * Throws if the `Option` is a {@linkcode None}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * Some(1).unwrap() === 1;
+   * None().unwrap() === 1; // throws
+   * ```
+   */
+  unwrap(): T;
+
+  /**
+   * Returns a new `Option` where the value is mapped with `fn`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * Some(1).map((v) => v + 1).contains(2) === true;
+   * None<number>().map((v) => v + 1).contains(2) === false;
+   * ```
+   */
+  map<U>(fn: ((_: T) => U)): Option<U>;
+
+  /**
+   * Returns `other` if this and `other` are {@linkcode Some}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * const one = Some(1);
+   * const two = Some(2);
+   * const none = None<number>();
+   *
+   * one.and(two) === two;
+   * one.and(none).isNone() === true;
+   * none.and(two).isNone() === true;
+   * none.and(none).isNone() === true;
+   * ```
+   */
+  and<U>(other: Option<U>): Option<U>;
+
+  /**
+   * Returns this or `other` if either is {@linkcode Some}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * const one = Some(1);
+   * const two = Some(2);
+   * const none = None<number>();
+   *
+   * one.or(two) === one;
+   * one.or(none) === one;
+   * none.or(two) === two;
+   * none.or(none).isNone() === true;
+   * ```
+   */
+  or(other: Option<T>): Option<T>;
+
+  /**
+   * Returns this or `other` if only one is {@linkcode Some}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { None, Some } from "./option.ts";
+   *
+   * const one = Some(1);
+   * const two = Some(2);
+   * const none = None<number>();
+   *
+   * one.or(two).isNone === true;
+   * one.or(none) === one;
+   * none.or(two) === two;
+   * none.or(none).isNone() === true;
+   */
+  xor(other: Option<T>): Option<T>;
+
+  // /**
+  //  * Returns the nested `Option`.
+  //  *
+  //  * ## Examples
+  //  *
+  //  * ```ts
+  //  * import { None, Some, type Option } from "./option.ts";
+  //  *
+  //  * const one = Some(1);
+  //  *
+  //  * Some(one).flatten() === one;
+  //  * None<Option<number>>().flatten().isNone() === true;
+  //  * ```
+  //  */
+  // flatten(this: Option<Option<T>>): Option<T>;
+};
+
+class SomeImpl<T> implements Option<T> {
+  #value: T;
+
+  constructor(value: T) {
+    this.#value = value;
   }
-}
 
-/**
- * Returns the contained [`Some`] value.
- *
- * ## Throws
- *
- * Throws if the [`Option`] is a [`None`].
- *
- * ## Example
- *
- * ```ts
- * import { Some, unwrap } from "./option.ts";
- *
- * const one = unwrap(Some(1));
- * ```
- *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
- * [`None`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#None
- */
-export function unwrap<T>(option: Option<T>): T {
-  return expect(
-    option,
-    "called `unwrap()` on a `None`",
-  );
-}
-
-/**
- * Returns `b` if `a` and `b` are [`Some`].
- *
- * ## Example
- *
- * ```ts
- * import { Some, and } from "./option.ts";
- *
- * const b = and(Some(1), Some(2));
- * ```
- *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- */
-export function and<T, U>(a: Option<T>, b: Option<U>): Option<U> {
-  if (a._tag === "some" && b._tag === "some") {
-    return b;
-  } else {
-    return None;
+  isSome(): boolean {
+    return true;
   }
+
+  isNone(): boolean {
+    return false;
+  }
+
+  contains<U extends T>(value: U): boolean {
+    return this.#value === value;
+  }
+
+  expect(): T {
+    return this.#value;
+  }
+
+  unwrap(): T {
+    return this.#value;
+  }
+
+  map<U>(fn: ((_: T) => U)): Option<U> {
+    return Some(fn(this.#value));
+  }
+
+  and<U>(other: Option<U>): Option<U> {
+    if (other.isSome()) {
+      return other;
+    } else {
+      return None<U>();
+    }
+  }
+
+  or(): Option<T> {
+    return this;
+  }
+
+  xor(other: Option<T>): Option<T> {
+    if (!(other instanceof SomeImpl)) {
+      return this;
+    } else {
+      return None<T>();
+    }
+  }
+
+  // flatten(this: SomeImpl<Option<T>>): Option<T> {
+  //   return this.#value;
+  // }
 }
 
-/**
- * Returns `a` or `b` if one of them is [`Some`].
- *
- * ## Example
- *
- * ```ts
- * import { Some, or } from "./option.ts";
- *
- * const a = or(Some(1), Some(2));
- * ```
- *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- */
-export function or<T>(a: Option<T>, b: Option<T>): Option<T> {
-  if (a._tag === "some") {
-    return a;
-  } else if (b._tag === "some") {
-    return b;
-  } else {
-    return None;
+class NoneImpl<T> implements Option<T> {
+  isSome(): boolean {
+    return false;
   }
-}
 
-/**
- * Returns `a` or `b` if only one is [`Some`].
- *
- * ## Example
- *
- * ```ts
- * import { Some, None, xor } from "./option.ts";
- *
- * const a = xor(None, Some(2));
- * ```
- *
- * [`Some`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Some
- */
-export function xor<T>(a: Option<T>, b: Option<T>): Option<T> {
-  if (a._tag === "some" && b._tag === "none") {
-    return a;
-  } else if (a._tag === "none" && b._tag === "some") {
-    return b;
-  } else {
-    return None;
+  isNone(): boolean {
+    return true;
   }
-}
 
-/**
- * Returns the nested [`Option`] in an `Option<Option<T>>`.
- *
- * ## Example
- *
- * ```ts
- * import { Some, flatten } from "./option.ts"
- *
- * const one = flatten(Some(Some(1)));
- * ```
- *
- * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
- */
-export function flatten<T>(option: Option<Option<T>>): Option<T> {
-  if (option._tag === "some") {
-    return option.value;
-  } else {
-    return None;
+  contains(): boolean {
+    return false;
   }
-}
 
-/**
- * Returns a new [`Option`] of the provided [`Option`]s value mapped with
- * function `f`.
- *
- * ## Example
- *
- * ```ts
- * import { Some, map } from "./option.ts";
- *
- * const two = map(Some(1), (num) => num + 1);
- * ```
- *
- * [`Option`]: https://doc.deno.land/https/deno.land/x/ahh/src/option.ts#Option
- */
-export function map<T, U>(option: Option<T>, f: (_: T) => U): Option<U> {
-  if (option._tag === "some") {
-    return Some(f(option.value));
-  } else {
-    return None;
+  expect(message: string): T {
+    throw Error(message);
   }
+
+  unwrap(): T {
+    return this.expect("called unwrap() on a None");
+  }
+
+  map<U>(): Option<U> {
+    return None();
+  }
+
+  and<U>(): Option<U> {
+    return None<U>();
+  }
+
+  or(other: Option<T>): Option<T> {
+    if (other instanceof SomeImpl) {
+      return other;
+    } else {
+      return None<T>();
+    }
+  }
+
+  xor(other: Option<T>): Option<T> {
+    if (other instanceof SomeImpl) {
+      return other;
+    } else {
+      return None<T>();
+    }
+  }
+
+  // flatten(): Option<T> {
+  //   return None<T>();
+  // }
 }

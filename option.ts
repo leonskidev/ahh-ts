@@ -230,7 +230,7 @@ class SomeImpl<T> implements Option<T> {
   }
 
   xor(other: Option<T>): Option<T> {
-    if (!(other instanceof SomeImpl)) {
+    if (other.isNone()) {
       return this;
     } else {
       return None<T>();
@@ -268,7 +268,7 @@ class NoneImpl<T> implements Option<T> {
   }
 
   or(other: Option<T>): Option<T> {
-    if (other instanceof SomeImpl) {
+    if (other.isSome()) {
       return other;
     } else {
       return None<T>();
@@ -276,7 +276,7 @@ class NoneImpl<T> implements Option<T> {
   }
 
   xor(other: Option<T>): Option<T> {
-    if (other instanceof SomeImpl) {
+    if (other.isSome()) {
       return other;
     } else {
       return None<T>();

@@ -1,4 +1,35 @@
-_Safe code in [deno] made simple._
+# Ahh
+
+A collection of mostly rusty stuff to help make TypeScript a little easier to
+work with &mdash; if you don't mind a little verbosity.
+
+## Example
+
+This is an example on how you might use [`result.ts`](./result.ts):
+
+```ts
+import { Err, Ok, Result } from "./result.ts";
+
+function mustStartWith(s: string, start: string): Result<string, string> {
+  if (s.startsWith(start)) {
+    return Ok(s);
+  } else {
+    return Err(`string must start with "${start}"`);
+  }
+}
+
+console.log(mustStartWith("abc", "a").contains("abc"));
+console.log(
+  mustStartWith("bca", "a").containsErr(`string must start with "a"`),
+);
+```
+
+## Licence
+
+This is licenced under the ISC Licence, see the [`LICENCE`](`./LICENCE`) file
+for more information.
+
+<!-- _Safe code in [deno] made simple._
 
 ## Usage
 
@@ -29,4 +60,4 @@ This is licenced under **MIT**; you can find out more in the provided
 
 [Deno]: https://github.com/denoland/deno
 [documentation]: https://doc.deno.land/https/deno.land/x/ahh/mod.ts
-[`LICENCE`]: ./LICENCE
+[`LICENCE`]: ./LICENCE -->

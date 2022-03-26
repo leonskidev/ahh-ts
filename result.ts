@@ -1,31 +1,9 @@
-/**
- * Represents a value that is successful.
- *
- * ## Examples
- *
- * ```ts
- * import { Ok } from "./result.ts";
- *
- * const unk = Ok(1);
- * const num = Ok<number, string>(1);
- * ```
- */
+/** Represents a value that is successful. */
 export function Ok<T, E>(value: T): Result<T, E> {
   return new OkImpl<T, E>(value);
 }
 
-/**
- * Represents a value that is erroneous.
- *
- * ## Examples
- *
- * ```ts
- * import { Err } from "./result.ts";
- *
- * const unk = Err(1);
- * const num = Err<string, number>(1);
- * ```
- */
+/** Represents a value that is erroneous. */
 export function Err<T, E>(value: E): Result<T, E> {
   return new ErrImpl<T, E>(value);
 }

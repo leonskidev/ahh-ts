@@ -20,6 +20,20 @@ export interface Result<T, E> {
   isErr(): boolean;
 
   /**
+   * Returns the contained {@linkcode Ok} value.
+   *
+   * Unlike {@linkcode unwrap}, this method will never throw.
+   */
+  ok(this: Result<T, never>): T;
+
+  /**
+   * Returns the contained {@linkcode Err} value.
+   *
+   * Unlike {@linkcode unwrapErr}, this method will never throw.
+   */
+  err(this: Result<never, E>): E;
+
+  /**
    * Returns `true` of the `Result` is an {@linkcode Ok} containing `value`.
    */
   contains<U extends T>(value: U): boolean;
@@ -89,6 +103,14 @@ class OkImpl<T, E> implements Result<T, E> {
     return false;
   }
 
+  ok(this: OkImpl<T, never>): T {
+    return this.#value;
+  }
+
+  err(this: Result<never, E>): E {
+    throw Error("this is a bug");
+  }
+
   contains<U extends T>(value: U): boolean {
     return this.#value === value;
   }
@@ -149,6 +171,14 @@ class ErrImpl<T, E> implements Result<T, E> {
 
   isErr(): boolean {
     return true;
+  }
+
+  ok(this: Result<T, never>): T {
+    throw Error("this is a bug");
+  }
+
+  err(this: ErrImpl<never, E>): E {
+    return this.#value;
   }
 
   contains(): boolean {

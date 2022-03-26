@@ -11,6 +11,18 @@ Deno.test("is_err", async (t) => {
   await t.step("err", () => assertEquals(Err(1).isErr(), true));
 });
 
+Deno.test("ok", async (t) => {
+  await t.step("ok", () => assertEquals(Ok<number, never>(1).ok(), 1));
+  // NOTE: `ok` cannot be used on an `Err` ever
+  // await t.step("err", () => assertEquals(Err(1).ok(), true));
+});
+
+Deno.test("err", async (t) => {
+  // NOTE: `err` cannot be used on an `Ok` ever
+  // await t.step("ok", () => assertEquals(Ok<(1).err(), false));
+  await t.step("err", () => assertEquals(Err<never, number>(1).err(), 1));
+});
+
 Deno.test("contains", async (t) => {
   await t.step("ok_true", () => assertEquals(Ok(1).contains(1), true));
   await t.step("ok_false", () => assertEquals(Ok(1).contains(0), false));

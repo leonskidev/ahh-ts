@@ -20,7 +20,7 @@ export interface Option<T> {
   isNone(): boolean;
 
   /**
-   * Returns `true` of the `Option` is a {@linkcode Some} containing `value`.
+   * Returns `true` if the `Option` is a {@linkcode Some} containing `value`.
    */
   contains<U extends T>(value: U): boolean;
 

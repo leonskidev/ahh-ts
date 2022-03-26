@@ -22,24 +22,24 @@ export interface Result<T, E> {
   /**
    * Returns the contained {@linkcode Ok} value.
    *
-   * Unlike {@linkcode unwrap}, this method will never throw.
+   * Unlike {@linkcode Result.unwrap}, this method will never throw.
    */
   ok(this: Result<T, never>): T;
 
   /**
    * Returns the contained {@linkcode Err} value.
    *
-   * Unlike {@linkcode unwrapErr}, this method will never throw.
+   * Unlike {@linkcode Result.unwrapErr}, this method will never throw.
    */
   err(this: Result<never, E>): E;
 
   /**
-   * Returns `true` of the `Result` is an {@linkcode Ok} containing `value`.
+   * Returns `true` if the `Result` is an {@linkcode Ok} containing `value`.
    */
   contains<U extends T>(value: U): boolean;
 
   /**
-   * Returns `true` of the `Result` is an {@linkcode Err} containing `value`.
+   * Returns `true` if the `Result` is an {@linkcode Err} containing `value`.
    */
   containsErr<F extends E>(value: F): boolean;
 

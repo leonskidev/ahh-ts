@@ -29,7 +29,11 @@ Deno.test("unwrap", async (t) => {
   await t.step(
     "none",
     () =>
-      assertThrows(() => None().unwrap(), Error, "called unwrap() on a None"),
+      assertThrows(
+        () => None().unwrap(),
+        Error,
+        "called `Option.unwrap()` on a `None` value",
+      ),
   );
 });
 

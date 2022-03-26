@@ -184,7 +184,6 @@ export type Option<T> = {
    * none.or(none).isNone() === true;
    */
   xor(other: Option<T>): Option<T>;
-
   // /**
   //  * Returns the nested `Option`.
   //  *
@@ -276,7 +275,7 @@ class NoneImpl<T> implements Option<T> {
   }
 
   unwrap(): T {
-    return this.expect("called unwrap() on a None");
+    return this.expect("called `Option.unwrap()` on a `None` value");
   }
 
   map<U>(): Option<U> {

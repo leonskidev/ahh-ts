@@ -1,14 +1,14 @@
 # Ahh
 
-A collection of mostly rusty stuff to help make TypeScript a little easier to
-work with &mdash; if you don't mind a little verbosity.
+A collection of mostly rust-inspired stuff to help make TypeScript a litte
+easier to work with &mdash; if you don't mind a little verbosity.
 
 ## Example
 
 This is an example on how you might use results:
 
 ```ts
-import { Err, Ok, Result } from "./mod.ts";
+import { Err, Ok, R, Result } from "./mod.ts";
 
 function mustStartWith(s: string, start: string): Result<string, string> {
   if (s.startsWith(start)) {
@@ -18,9 +18,9 @@ function mustStartWith(s: string, start: string): Result<string, string> {
   }
 }
 
-console.log(mustStartWith("abc", "a").contains("abc"));
+console.log(R.contains(mustStartWith("abc", "a"), "abc"));
 console.log(
-  mustStartWith("bca", "a").containsErr(`string must start with "a"`),
+  R.containsErr(mustStartWith("bca", "a"), `string must start with "a"`),
 );
 ```
 

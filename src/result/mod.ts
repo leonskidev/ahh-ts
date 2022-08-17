@@ -31,6 +31,7 @@ export function Ok<T, E>(v: T): Result<T, E> {
   return { [OK]: v };
 }
 
+/** Functionality for {@linkcode Result}. */
 export const R = {
   /** Returns whether a {@linkcode Result} is an {@linkcode Ok}. */
   isOk: <T, E>(r: Result<T, E>): r is Ok<T> => Object.hasOwn(r, OK),

@@ -29,6 +29,7 @@ export function Some<T>(v: T): Option<T> {
   return { [SOME]: v };
 }
 
+/** Functionality for {@linkcode Option}. */
 export const O = {
   /** Returns whether an {@linkcode Option} is a {@linkcode Some}. */
   isSome: <T>(o: Option<T>): o is Some<T> => Object.hasOwn(o, SOME),

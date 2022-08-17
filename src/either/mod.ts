@@ -31,6 +31,7 @@ export function Right<L, R>(v: R): Either<L, R> {
   return { [RIGHT]: v };
 }
 
+/** Functionality for {@linkcode Either}. */
 export const E = {
   /** Returns whether an {@linkcode Either} is a {@linkcode Left}. */
   isLeft: <L, R>(e: Either<L, R>): e is Left<L> => Object.hasOwn(e, LEFT),

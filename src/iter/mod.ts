@@ -20,6 +20,7 @@ export type Peekable<T> = {
   peek: () => Option<T>;
 };
 
+/** Functionality for {@linkcode Iterator}. */
 export const I = {
   /** Creates an {@linkcode Iterator} where each iteration calls `f`. */
   fn: <T>(f: Iterator<T>["next"]): Iterator<T> => ({
@@ -255,73 +256,3 @@ export const I = {
     return next;
   },
 };
-
-// /**
-//  * Consumes the {@linkcode Iterator}, applying `f` to each item and returning
-//  * the accumulator.
-//  */
-// export function fold<T, A>(
-//   iter: Iterator<T>,
-//   init: A,
-//   f: (acc: A, item: T) => A,
-// ): A {
-//   let next = iter.next();
-//   while (isSome(next)) {
-//     // SAFETY: checked in the loop condition
-//     init = f(init, unwrap(next));
-//     next = iter.next();
-//   }
-//   return init;
-// }
-
-// /**
-//  * Consumes the {@linkcode Iterator}, counting the number of iterations.
-//  *
-//  * This will call {@linkcode next} repeatedly until {@linkcode None} is
-//  * encountered, returning the number of times it saw {@linkcode Some}.
-//  */
-// export function count<T>(iter: Iterator<T>): number {
-//   return fold(iter, 0, (c) => ++c);
-// }
-
-// /** Consumes the {@linkcode Iterator}, returning the last item. */
-// export function last<T>(iter: Iterator<T>): Option<T> {
-//   return fold(iter, None as Option<T>, (_, item) => Some(item));
-// }
-
-// /**
-//  * Consumes the {@linkcode Iterator}, checking if every item matches a
-//  * predicate.
-//  */
-// export function all<T>(iter: Iterator<T>, f: (item: T) => boolean): boolean {
-//   return fold<T, boolean>(
-//     iter,
-//     true,
-//     (acc, item) => (acc ? acc = f(item) : acc),
-//   );
-// }
-
-// /**
-//  * Consumes the {@linkcode Iterator}, checking if any item matches a
-//  * predicate.
-//  */
-// export function any<T>(iter: Iterator<T>, f: (item: T) => boolean): boolean {
-//   return fold<T, boolean>(
-//     iter,
-//     false,
-//     (acc, item) => (!acc ? acc = f(item) : acc),
-//   );
-// }
-
-// /**
-//  * Creates an {@linkcode Iterator} that maps `f` on each item.
-//  *
-//  * Prefer a `for` loop if there are side-effects.
-//  */
-// export function map<T, U>(iter: Iterator<T>, f: (item: T) => U): Iterator<U> {
-//   return { next: () => mapOption(iter.next(), f) };
-// }
-
-// // export function filter<T>(iter: Iterator<T>, f: (item: T) => boolean): Iterator<T> {
-// //   return {};
-// // }

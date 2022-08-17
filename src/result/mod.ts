@@ -1,13 +1,13 @@
 import { None, O, Option, SOME, Some } from "../option/mod.ts";
 
 /**
- * Symbol for {@linkcode Err}, the same as `Symbol.for("err")`..
+ * Symbol for {@linkcode Err}, the same as `Symbol.for("err")`.
  *
  * Useful for internals and testing.
  */
 export const ERR = Symbol.for("err");
 /**
- * Symbol for {@linkcode Ok}, the same as `Symbol.for("ok")`..
+ * Symbol for {@linkcode Ok}, the same as `Symbol.for("ok")`.
  *
  * Useful for internals and testing.
  */

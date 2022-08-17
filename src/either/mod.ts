@@ -1,13 +1,13 @@
 import { None, Option, Some } from "../option/mod.ts";
 
 /**
- * Symbol for {@linkcode Left}, the same as `Symbol.for("left")`..
+ * Symbol for {@linkcode Left}, the same as `Symbol.for("left")`.
  *
  * Useful for internals and testing.
  */
 export const LEFT = Symbol.for("left");
 /**
- * Symbol for {@linkcode Right}, the same as `Symbol.for("right")`..
+ * Symbol for {@linkcode Right}, the same as `Symbol.for("right")`.
  *
  * Useful for internals and testing.
  */

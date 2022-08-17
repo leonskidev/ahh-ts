@@ -22,21 +22,20 @@ export type Peekable<T> = {
 
 export const I = {
   /** Creates an {@linkcode Iterator} where each iteration calls `f`. */
-  fn: <T>(f: Iterator<T>["next"]): Iterator<T> =>
-    ({
-      next: () => f(),
-      [Symbol.iterator](): globalThis.Iterator<T> {
-        return {
-          next: () => {
-            const next = this.next();
-            return {
-              done: O.isNone(next),
-              value: O.unwrapOr(next, undefined!),
-            };
-          },
-        };
-      },
-    }),
+  fn: <T>(f: Iterator<T>["next"]): Iterator<T> => ({
+    next: () => f(),
+    [Symbol.iterator](): globalThis.Iterator<T> {
+      return {
+        next: () => {
+          const next = this.next();
+          return {
+            done: O.isNone(next),
+            value: O.unwrapOr(next, undefined!),
+          };
+        },
+      };
+    },
+  }),
 
   /** Converts an {@linkcode Iterable} into an {@linkcode Iterator}. */
   iter: <T>(iter: Iterable<T>): Iterator<T> => {
@@ -44,7 +43,7 @@ export const I = {
     return I.fn(() => {
       const next = iter_.next();
       return (next.done ? None : Some(next.value));
-    })
+    });
   },
 
   /** Creates an {@linkcode Iterator} that yields nothing. */
@@ -70,7 +69,7 @@ export const I = {
       } else {
         return None;
       }
-    })
+    });
   },
 
   /**
@@ -242,8 +241,7 @@ export const I = {
     I.fold(iter, None as Option<T>, (_, item) => Some(item)),
 
   /** Returns the `n` item from an {@linkcode Iterator}. */
-  nth: <T>(iter: Iterator<T>, n: number): Option<T> =>
-    I.skip(iter, n).next(),
+  nth: <T>(iter: Iterator<T>, n: number): Option<T> => I.skip(iter, n).next(),
 
   /**
    * Returns the first item in an {@linkcode Iterator} that `f` returns `true`

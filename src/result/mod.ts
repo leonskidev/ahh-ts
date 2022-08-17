@@ -72,7 +72,10 @@ export const R = {
    * Throws if the {@linkcode Result} is an {@linkcode Err}.
    */
   unwrap: <T, E>(r: Result<T, E>): (typeof r) extends Err<E> ? never : T =>
-    R.expect(r, "called `unwrap()` on an `Err` value"),
+    R.expect(
+      r,
+      `called \`unwrap()\` on an \`Err\` value: ${(r as Err<E>)[ERR]}`,
+    ),
 
   /**
    * Returns the contained {@linkcode Err} value.
@@ -80,7 +83,10 @@ export const R = {
    * Throws if the {@linkcode Result} is an {@linkcode Ok}.
    */
   unwrapErr: <T, E>(r: Result<T, E>): (typeof r) extends Ok<T> ? never : E =>
-    R.expectErr(r, "called `unwrapErr()` on an `Ok` value"),
+    R.expectErr(
+      r,
+      `called \`unwrapErr()\` on an \`Ok\` value: ${(r as Ok<T>)[OK]}`,
+    ),
 
   /**
    * Returns the contained {@linkcode Ok} value or the provided `default`.

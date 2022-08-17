@@ -15,8 +15,6 @@ Deno.test("is_err", async (t) => {
   await t.step("err", () => assert(R.isErr(Err(1))));
 });
 
-// import { None, Some } from "../option/mod.ts";
-
 Deno.test("expect", async (t) => {
   await t.step("ok", () => assertEquals(R.expect(Ok(1), "returns"), 1));
   await t.step(
@@ -41,7 +39,7 @@ Deno.test("unwrap", async (t) => {
       assertThrows(
         () => R.unwrap(Err(1)),
         Error,
-        "called `unwrap()` on an `Err` value",
+        "called `unwrap()` on an `Err` value: 1",
       ),
   );
 });
@@ -53,7 +51,7 @@ Deno.test("unwrap_err", async (t) => {
       assertThrows(
         () => R.unwrapErr(Ok(1)),
         Error,
-        "called `unwrapErr()` on an `Ok` value",
+        "called `unwrapErr()` on an `Ok` value: 1",
       ),
   );
   await t.step("err", () => assertEquals(R.unwrapErr(Err(1)), 1));

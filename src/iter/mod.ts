@@ -22,8 +22,8 @@ export type Peekable<T> = {
 
 export const I = {
   /** Creates an {@linkcode Iterator} where each iteration calls `f`. */
-  fn: <T>(f: Iterator<T>["next"]): Iterator<T> => {
-    return {
+  fn: <T>(f: Iterator<T>["next"]): Iterator<T> =>
+    ({
       next: () => f(),
       [Symbol.iterator](): globalThis.Iterator<T> {
         return {
@@ -36,8 +36,7 @@ export const I = {
           },
         };
       },
-    };
-  },
+    }),
 
   /** Converts an {@linkcode Iterable} into an {@linkcode Iterator}. */
   iter: <T>(iter: Iterable<T>): Iterator<T> => {
@@ -45,7 +44,7 @@ export const I = {
     return I.fn(() => {
       const next = iter_.next();
       return (next.done ? None : Some(next.value));
-    });
+    })
   },
 
   /** Creates an {@linkcode Iterator} that yields nothing. */
@@ -71,7 +70,7 @@ export const I = {
       } else {
         return None;
       }
-    });
+    })
   },
 
   /**
@@ -81,8 +80,8 @@ export const I = {
    * If either {@linkcode Iterator} returns {@linkcode None}, so will this
    * {@linkcode Iterator}.
    */
-  zip: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<[T, T]> => {
-    return I.fn(() => {
+  zip: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<[T, T]> =>
+    I.fn(() => {
       const nextA = iterA.next();
       const nextB = iterB.next();
       if (O.isSome(nextA) && O.isSome(nextB)) {
@@ -90,32 +89,29 @@ export const I = {
       } else {
         return None;
       }
-    });
-  },
+    }),
 
   /**
    * Creates an {@linkcode Iterator} that will iterate over two other
    * {@linkcode Iterator}s sequentially.
    */
-  chain: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<T> => {
-    return I.fn(() => {
+  chain: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<T> =>
+    I.fn(() => {
       const next = iterA.next();
       if (O.isSome(next)) {
         return next;
       } else {
         return iterB.next();
       }
-    });
-  },
+    }),
 
   /**
    * Creates an {@linkcode Iterator} that maps `f` on each item.
    *
    * Prefer a `for` loop if there are side-effects.
    */
-  map: <T, U>(iter: Iterator<T>, f: (_: T) => U): Iterator<U> => {
-    return I.fn(() => O.map(iter.next(), f));
-  },
+  map: <T, U>(iter: Iterator<T>, f: (_: T) => U): Iterator<U> =>
+    I.fn(() => O.map(iter.next(), f)),
 
   /**
    * Creates an {@linkcode Iterator} which gives the current iteration as well
@@ -127,57 +123,52 @@ export const I = {
   },
 
   /** Creates an {@linkcode Iterator} that skips the first `n` items. */
-  skip: <T>(iter: Iterator<T>, n: number): Iterator<T> => {
-    return I.fn(() => {
+  skip: <T>(iter: Iterator<T>, n: number): Iterator<T> =>
+    I.fn(() => {
       while (n-- > 0) {
         iter.next();
       }
       return iter.next();
-    });
-  },
+    }),
 
   /**
    * Creates an {@linkcode Iterator} that skips items while `f` returns `true`.
    */
-  skipWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> => {
-    return I.fn(() => {
+  skipWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
+    I.fn(() => {
       let next = iter.next();
       while (O.isSome(next) && f(next[SOME])) {
         next = iter.next();
       }
       return next;
-    });
-  },
+    }),
 
   /** Creates an {@linkcode Iterator} than yields the first `n` items. */
-  take: <T>(iter: Iterator<T>, n: number): Iterator<T> => {
-    return I.fn(() => {
+  take: <T>(iter: Iterator<T>, n: number): Iterator<T> =>
+    I.fn(() => {
       if (n-- > 0) {
         return iter.next();
       }
       return None;
-    });
-  },
+    }),
 
   /**
    * Creates an {@linkcode Iterator} than yields items while `f` returns `true`.
    */
-  takeWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> => {
-    return I.fn(() => {
+  takeWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
+    I.fn(() => {
       const next = iter.next();
       if (O.isSome(next) && f(next[SOME])) {
         return next;
       }
       return None;
-    });
-  },
+    }),
 
   /**
    * Creates an {@linkcode Iterator} that yields items when `f` returns `true`.
    */
-  filter: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> => {
-    return I.fn(() => I.find(iter, f));
-  },
+  filter: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
+    I.fn(() => I.find(iter, f)),
 
   /** Creates an {@linkcode Iterator} that is also {@linkcode Peekable}. */
   peekable: <T>(iter: Iterator<T>): Iterator<T> & Peekable<T> => {
@@ -243,19 +234,16 @@ export const I = {
   },
 
   /** Consumes an {@linkcode Iterator} and returns the number of iterations. */
-  count: <T>(iter: Iterator<T>): number => {
-    return I.fold(iter, 0, (count, _) => count + 1);
-  },
+  count: <T>(iter: Iterator<T>): number =>
+    I.fold(iter, 0, (count, _) => count + 1),
 
   /** Consumes an {@linkcode Iterator} and returns the last item. */
-  last: <T>(iter: Iterator<T>): Option<T> => {
-    return I.fold(iter, None as Option<T>, (_, item) => Some(item));
-  },
+  last: <T>(iter: Iterator<T>): Option<T> =>
+    I.fold(iter, None as Option<T>, (_, item) => Some(item)),
 
   /** Returns the `n` item from an {@linkcode Iterator}. */
-  nth: <T>(iter: Iterator<T>, n: number): Option<T> => {
-    return I.skip(iter, n).next();
-  },
+  nth: <T>(iter: Iterator<T>, n: number): Option<T> =>
+    I.skip(iter, n).next(),
 
   /**
    * Returns the first item in an {@linkcode Iterator} that `f` returns `true`

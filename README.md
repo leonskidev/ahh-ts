@@ -26,4 +26,4 @@ All code in this repository is dual-licenced under either:
 - Apache Licence, Version 2.0 ([LICENCE](./LICENCE-APACHE) or
   http://www.apache.org/licenses/LICENSE-2.0)
 
-at your ption. This means you can select the licence you prefer!
+at your option. This means you can select the licence you prefer!

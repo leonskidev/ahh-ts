@@ -29,6 +29,7 @@ console.log(
 All code in this repository is dual-licenced under either:
 
 - MIT Licence ([LICENCE](./LICENCE-MIT) or https://opensource.org/licenses/MIT)
-- Apache Licence, Version 2.0 ([LICENCE](./LICENCE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- Apache Licence, Version 2.0 ([LICENCE](./LICENCE-APACHE) or
+  http://www.apache.org/licenses/LICENSE-2.0)
 
 at your ption. This means you can select the licence you prefer!

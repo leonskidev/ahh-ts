@@ -5,23 +5,17 @@ easier to work with &mdash; if you don't mind a little verbosity.
 
 ## Example
 
-This is an example on how you might use results:
+Here's a quick example of how you might use a few of this module's goodies:
 
 ```ts
-import { Err, Ok, R, Result } from "./mod.ts";
+import { I, Some } from "./mod.ts";
 
-function mustStartWith(s: string, start: string): Result<string, string> {
-  if (s.startsWith(start)) {
-    return Ok(s);
-  } else {
-    return Err(`string must start with "${start}"`);
-  }
+const len = 5;
+const iter = I.map(I.successors(Some(0), (n) => Some(n + 1)), (n) => n * 2);
+
+for (const n of I.take(iter, len)) {
+  console.log(n);
 }
-
-console.log(R.contains(mustStartWith("abc", "a"), "abc"));
-console.log(
-  R.containsErr(mustStartWith("bca", "a"), `string must start with "a"`),
-);
 ```
 
 ## Licence

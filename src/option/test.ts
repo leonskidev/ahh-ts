@@ -1,9 +1,9 @@
 import { assert, assertEquals, assertThrows } from "../../test_deps.ts";
-import { NONE, None, O, SOME, Some } from "./mod.ts";
+import { None, O, Some } from "./mod.ts";
 import { Err, Ok } from "../result/mod.ts";
 
-Deno.test("some", () => assertEquals(Some(1), { [SOME]: 1 }));
-Deno.test("none", () => assertEquals(None, { [NONE]: true }));
+Deno.test("some", () => assertEquals(Some(1), { some: 1 }));
+Deno.test("none", () => assertEquals(None, { none: undefined }));
 
 Deno.test("is_some", async (t) => {
   await t.step("some", () => assert(O.isSome(Some(1))));

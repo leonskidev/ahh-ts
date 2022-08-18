@@ -1,41 +1,28 @@
-import { OK, Ok, R, Result } from "../result/mod.ts";
-
-/**
- * Symbol for {@linkcode None}, the same as `Symbol.for("none")`.
- *
- * Useful for internals and testing.
- */
-export const NONE = Symbol.for("none");
-/**
- * Symbol for {@linkcode Some}, the same as `Symbol.for("some")`.
- *
- * Useful for internals and testing.
- */
-export const SOME = Symbol.for("some");
+import { Ok, R, Result } from "../result/mod.ts";
 
 /** Represents an {@linkcode Option} that does not exist. */
-export type None = Readonly<{ [NONE]: true }>;
+export type None = Readonly<{ none: undefined }>;
 /** Represents an {@linkcode Option} that does exist. */
-export type Some<T> = Readonly<{ [SOME]: T }>;
+export type Some<T> = Readonly<{ some: T }>;
 /**
  * Represents an optional value that either exists ({@linkcode Some}) or does
  * not exist ({@linkcode None}).
  */
 export type Option<T> = None | Some<T>;
 
-export const None: Option<never> = { [NONE]: true };
+export const None: Option<never> = { none: undefined };
 
 export function Some<T>(v: T): Option<T> {
-  return { [SOME]: v };
+  return { some: v };
 }
 
 /** Functionality for {@linkcode Option}. */
 export const O = {
   /** Returns whether an {@linkcode Option} is a {@linkcode Some}. */
-  isSome: <T>(o: Option<T>): o is Some<T> => Object.hasOwn(o, SOME),
+  isSome: <T>(o: Option<T>): o is Some<T> => Object.hasOwn(o, "some"),
 
   /** Returns whether an {@linkcode Option} is a {@linkcode None}. */
-  isNone: <T>(o: Option<T>): o is None => Object.hasOwn(o, NONE),
+  isNone: <T>(o: Option<T>): o is None => Object.hasOwn(o, "none"),
 
   /**
    * Returns the contained {@linkcode Some} value.
@@ -47,7 +34,7 @@ export const O = {
     o: Option<T>,
     message: string,
   ): typeof o extends None ? never : T => {
-    if (O.isSome(o)) return o[SOME];
+    if (O.isSome(o)) return o.some;
     throw Error(message);
   },
 
@@ -63,32 +50,32 @@ export const O = {
    * Returns the contained {@linkcode Some} value or the provided `default`.
    */
   unwrapOr: <T>(o: Option<T>, default_: T): T =>
-    O.isSome(o) ? o[SOME] : default_,
+    O.isSome(o) ? o.some : default_,
 
   /**
    * Maps the contained {@linkcode Some} value with `f`, or returns
    * {@linkcode None}.
    */
   map: <T, U>(o: Option<T>, f: (_: T) => U): Option<U> =>
-    O.isSome(o) ? Some(f(o[SOME])) : o,
+    O.isSome(o) ? Some(f(o.some)) : o,
 
   /**
    * Returns whether the contained {@linkcode Some} value strictly equals
    * `cmp`.
    */
   contains: <T>(o: Option<T>, cmp: T): boolean =>
-    O.isSome(o) ? o[SOME] === cmp : false,
+    O.isSome(o) ? o.some === cmp : false,
 
   /**
    * Returns the contained {@linkcode Option} value of a {@linkcode Some}, or
    * returns {@linkcode None}.
    */
-  flatten: <T>(o: Option<Option<T>>): Option<T> => O.isSome(o) ? o[SOME] : o,
+  flatten: <T>(o: Option<Option<T>>): Option<T> => O.isSome(o) ? o.some : o,
 
   /**
    * Transposes an {@linkcode Option} of a {@linkcode Result} into a
    * {@linkcode Result} of an {@linkcode Option}.
    */
   transpose: <T, E>(o: Option<Result<T, E>>): Result<Option<T>, E> =>
-    O.isSome(o) ? (R.isOk(o[SOME]) ? Ok(Some(o[SOME][OK])) : o[SOME]) : Ok(o),
+    O.isSome(o) ? (R.isOk(o.some) ? Ok(Some(o.some.ok)) : o.some) : Ok(o),
 };

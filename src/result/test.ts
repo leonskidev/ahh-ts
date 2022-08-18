@@ -2,8 +2,8 @@ import { assert, assertEquals, assertThrows } from "../../test_deps.ts";
 import { Err, Ok, R } from "./mod.ts";
 import { None, Some } from "../option/mod.ts";
 
-Deno.test("ok", () => assertEquals(Ok(1), { [Symbol.for("ok")]: 1 }));
-Deno.test("err", () => assertEquals(Err(1), { [Symbol.for("err")]: 1 }));
+Deno.test("ok", () => assertEquals(Ok(1), { ok: 1 }));
+Deno.test("err", () => assertEquals(Err(1), { err: 1 }));
 
 Deno.test("is_ok", async (t) => {
   await t.step("ok", () => assert(R.isOk(Ok(1))));

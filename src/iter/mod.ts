@@ -1,4 +1,4 @@
-import { None, O, Option, SOME, Some } from "../option/mod.ts";
+import { None, O, Option, Some } from "../option/mod.ts";
 
 /** An interface for dealing with iterators. */
 export type Iterator<T> = {
@@ -65,7 +65,7 @@ export const I = {
     return I.fn(() => {
       if (O.isSome(next)) {
         const item = next;
-        next = f(item[SOME]);
+        next = f(item.some);
         return item;
       } else {
         return None;
@@ -137,7 +137,7 @@ export const I = {
   skipWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
     I.fn(() => {
       let next = iter.next();
-      while (O.isSome(next) && f(next[SOME])) {
+      while (O.isSome(next) && f(next.some)) {
         next = iter.next();
       }
       return next;
@@ -158,7 +158,7 @@ export const I = {
   takeWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
     I.fn(() => {
       const next = iter.next();
-      if (O.isSome(next) && f(next[SOME])) {
+      if (O.isSome(next) && f(next.some)) {
         return next;
       }
       return None;
@@ -214,7 +214,7 @@ export const I = {
     while (true) {
       const next = iter.next();
       if (O.isSome(next)) {
-        f(next[SOME]);
+        f(next.some);
       } else {
         break;
       }
@@ -250,7 +250,7 @@ export const I = {
    */
   find: <T>(iter: Iterator<T>, f: (_: T) => boolean): Option<T> => {
     let next = iter.next();
-    while (O.isSome(next) && !f(next[SOME])) {
+    while (O.isSome(next) && !f(next.some)) {
       next = iter.next();
     }
     return next;

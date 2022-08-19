@@ -11,11 +11,15 @@ export type Right<T> = Readonly<{ right: T }>;
 export type Either<L, R> = Left<L> | Right<R>;
 
 export function Left<L, R>(v: L): Either<L, R> {
-  return { left: v };
+  return Object.defineProperties({ left: v }, {
+    toString: { value: (): string => `Left(${v})` },
+  });
 }
 
 export function Right<L, R>(v: R): Either<L, R> {
-  return { right: v };
+  return Object.defineProperties({ right: v }, {
+    toString: { value: (): string => `Right(${v})` },
+  });
 }
 
 /** Functionality for {@linkcode Either}. */
@@ -139,8 +143,7 @@ export const E = {
   intoRight: <R>(e: Either<never, R>): R => (e as Right<R>).right,
 
   /** Converts a {@linkcode Left} into an {@linkcode Option}. */
-  left: <L, R>(e: Either<L, R>): Option<L> =>
-    E.isLeft(e) ? Some(e.left) : None,
+  left: <L, R>(e: Either<L, R>): Option<L> => E.isLeft(e) ? Some(e.left) : None,
 
   /** Converts a {@linkcode Right} into an {@linkcode Option}. */
   right: <L, R>(e: Either<L, R>): Option<R> =>

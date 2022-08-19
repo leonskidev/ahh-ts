@@ -10,10 +10,18 @@ export type Some<T> = Readonly<{ some: T }>;
  */
 export type Option<T> = None | Some<T>;
 
-export const None: Option<never> = { none: undefined };
+export const None: Option<never> = Object.defineProperties(
+  { none: undefined },
+  {
+    toString: { value: (): string => "None" },
+    toJSON: { value: () => ({ none: null }) },
+  },
+);
 
 export function Some<T>(v: T): Option<T> {
-  return { some: v };
+  return Object.defineProperties({ some: v }, {
+    toString: { value: (): string => `Some(${v})` },
+  });
 }
 
 /** Functionality for {@linkcode Option}. */

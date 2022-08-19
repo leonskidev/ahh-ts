@@ -11,11 +11,15 @@ export type Ok<T> = Readonly<{ ok: T }>;
 export type Result<T, E> = Err<E> | Ok<T>;
 
 export function Err<T, E>(v: E): Result<T, E> {
-  return { err: v };
+  return Object.defineProperties({ err: v }, {
+    toString: { value: (): string => `Err(${v})` },
+  });
 }
 
 export function Ok<T, E>(v: T): Result<T, E> {
-  return { ok: v };
+  return Object.defineProperties({ ok: v }, {
+    toString: { value: (): string => `Ok(${v})` },
+  });
 }
 
 /** Functionality for {@linkcode Result}. */

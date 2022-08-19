@@ -2,8 +2,8 @@ import { assert, assertEquals, assertThrows } from "../../test_deps.ts";
 import { E, Left, Right } from "./mod.ts";
 import { None, Some } from "../option/mod.ts";
 
-Deno.test("left", () => assertEquals(Left(1), { [Symbol.for("left")]: 1 }));
-Deno.test("right", () => assertEquals(Right(1), { [Symbol.for("right")]: 1 }));
+Deno.test("left", () => assertEquals(Left(1), { left: 1 }));
+Deno.test("right", () => assertEquals(Right(1), { right: 1 }));
 
 Deno.test("is_left", async (t) => {
   await t.step("left", () => assert(E.isLeft(Left(1))));

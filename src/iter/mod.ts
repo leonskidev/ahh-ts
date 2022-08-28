@@ -41,7 +41,7 @@ export const I = {
    * ```
    */
   fn: <T>(f: Iterator<T>["next"]): Iterator<T> => ({
-    next: () => f(),
+    next: f,
     [Symbol.iterator](): globalThis.Iterator<T> {
       return {
         next: () => {
@@ -268,6 +268,32 @@ export const I = {
     let i = 0;
     return I.map(iter, (item) => [i++, item]);
   },
+
+  /**
+   * Creates an {@linkcode Iterator} that flattens a layer of nested
+   * {@linkcode Iterator}s.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { assertEquals } from "../../test_deps.ts";
+   * import { I, Some, None } from "../../mod.ts";
+   *
+   * const iter = I.iter([I.iter([1, 2]), I.iter([3, 4])]);
+   *
+   * assertEquals(iter.next(), Some(1));
+   * assertEquals(iter.next(), Some(2));
+   * assertEquals(iter.next(), Some(3));
+   * assertEquals(iter.next(), Some(4));
+   * assertEquals(iter.next(), None);
+   * ```
+   */
+  flatten: <T>(iter: Iterator<Iterator<T>>): Iterator<T> =>
+    I.fold(
+      iter,
+      O.unwrapOr(iter.next(), I.empty()),
+      (iterA, iterB) => I.chain(iterA, iterB),
+    ),
 
   /**
    * Creates an {@linkcode Iterator} that skips the first `n` items.

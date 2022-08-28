@@ -110,6 +110,16 @@ Deno.test("enumerate", () => {
   assertEquals(iter.next(), None);
 });
 
+Deno.test("flatten", () => {
+  const iter = I.flatten(I.iter([I.iter([1, 2]), I.iter([3, 4])]));
+
+  assertEquals(iter.next(), Some(1));
+  assertEquals(iter.next(), Some(2));
+  assertEquals(iter.next(), Some(3));
+  assertEquals(iter.next(), Some(4));
+  assertEquals(iter.next(), None);
+});
+
 Deno.test("skip", () => {
   const iter = I.skip(I.iter([1, 2, 3]), 2);
   assertEquals(iter.next(), Some(3));

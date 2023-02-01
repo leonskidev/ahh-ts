@@ -11,7 +11,7 @@ export type Option<T> = None | Some<T>;
 export const None = undefined;
 
 /** Functionality for {@linkcode Option}. */
-export const O = {
+export class O {
   /**
    * Returns whether an {@linkcode Option} is a {@linkcode Some}.
    *
@@ -24,7 +24,9 @@ export const O = {
    * console.log(O.isSome(None)); // false
    * ```
    */
-  isSome: <T>(o: Option<T>): o is Some<T> => o !== undefined && o !== null,
+  static isSome<T>(o: Option<T>): o is Some<T> {
+    return o !== undefined && o !== null;
+  }
 
   /**
    * Returns whether an {@linkcode Option} is a {@linkcode None}.
@@ -38,7 +40,9 @@ export const O = {
    * console.log(O.isNone(None)); // true
    * ```
    */
-  isNone: <T>(o: Option<T>): o is None => o === undefined || o === null,
+  static isNone<T>(o: Option<T>): o is None {
+    return o === undefined || o === null;
+  }
 
   /**
    * Returns the contained {@linkcode Some} value.
@@ -55,14 +59,14 @@ export const O = {
    * O.expect(None, "throws"); // throws
    * ```
    */
-  expect: <T>(
+  static expect<T>(
     o: Option<T>,
     message: string,
-  ): typeof o extends Some<T> ? T : never => {
+  ): typeof o extends Some<T> ? T : never {
     if (O.isNone(o)) throw Error(message);
     // TODO: why? also fix this
     return o as never;
-  },
+  }
 
   /**
    * Returns the contained {@linkcode Some} value.
@@ -78,8 +82,9 @@ export const O = {
    * O.unwrap(None); // throws
    * ```
    */
-  unwrap: <T>(o: Option<T>): typeof o extends Some<T> ? T : never =>
-    O.expect(o, "called `unwrap()` on a `None` value"),
+  static unwrap<T>(o: Option<T>): typeof o extends Some<T> ? T : never {
+    return O.expect(o, "called `unwrap()` on a `None` value");
+  }
 
   /**
    * Returns the contained {@linkcode Some} value or the provided `default`.
@@ -93,7 +98,9 @@ export const O = {
    * console.log(O.unwrapOr(None, 5)); // 5
    * ```
    */
-  unwrapOr: <T>(o: Option<T>, default_: T): T => O.isSome(o) ? o : default_,
+  static unwrapOr<T>(o: Option<T>, default_: T): T {
+    return O.isSome(o) ? o : default_;
+  }
 
   /**
    * Maps the contained {@linkcode Some} value with `f`, otherwise
@@ -108,8 +115,9 @@ export const O = {
    * console.log(O.map<number, number>(None, (i) => i + 1)); // undefined
    * ```
    */
-  map: <T, U>(o: Option<T>, f: (_: T) => U): Option<U> =>
-    O.isSome(o) ? f(o) : o,
+  static map<T, U>(o: Option<T>, f: (_: T) => U): Option<U> {
+    return O.isSome(o) ? f(o) : o;
+  }
 
   /**
    * Returns whether the contained {@linkcode Some} value strictly equals `v`.
@@ -124,5 +132,7 @@ export const O = {
    * console.log(O.contains(None, 1)); // false
    * ```
    */
-  contains: <T>(o: Option<T>, v: T): boolean => o === v,
-};
+  static contains<T>(o: Option<T>, v: T): boolean {
+    return o === v;
+  }
+}

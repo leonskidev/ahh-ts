@@ -23,7 +23,7 @@ export type Peekable<T> = {
 } & Iterator<T>;
 
 /** Functionality for {@linkcode Iterator}. */
-export const I = {
+export class I {
   /**
    * Creates an {@linkcode Iterator} where each iteration calls `f`.
    *
@@ -39,20 +39,22 @@ export const I = {
    * // ...
    * ```
    */
-  fn: <T>(f: Iterator<T>["next"]): Iterator<T> => ({
-    next: f,
-    [Symbol.iterator](): globalThis.Iterator<T> {
-      return {
-        next: () => {
-          const next = this.next();
-          return {
-            done: O.isNone(next) as true,
-            value: next,
-          };
-        },
-      };
-    },
-  }),
+  static fn<T>(f: Iterator<T>["next"]): Iterator<T> {
+    return {
+      next: f,
+      [Symbol.iterator](): globalThis.Iterator<T> {
+        return {
+          next: () => {
+            const next = this.next();
+            return {
+              done: O.isNone(next) as true,
+              value: next,
+            };
+          },
+        };
+      },
+    };
+  }
 
   /**
    * Creates an {@linkcode Iterator} from an {@linkcode Iterable}.
@@ -69,13 +71,13 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  iter: <T>(iter: Iterable<T>): Iterator<T> => {
+  static iter<T>(iter: Iterable<T>): Iterator<T> {
     const iter_ = iter[Symbol.iterator]();
     return I.fn(() => {
       const next = iter_.next();
       return next.done ? None : next.value;
     });
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that returns nothing.
@@ -91,7 +93,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  empty: <T>(): Iterator<T> => I.fn(() => None as T),
+  static empty<T>(): Iterator<T> {
+    return I.fn(() => None as T);
+  }
 
   /**
    * Creates an {@linkcode Iterator} that returns exactly one item.
@@ -107,7 +111,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  once: <T>(item: T): Iterator<T> => I.iter([item]),
+  static once<T>(item: T): Iterator<T> {
+    return I.iter([item]);
+  }
 
   /**
    * Creates an {@linkcode Iterator} that endlessly returns an item.
@@ -124,7 +130,9 @@ export const I = {
    * console.log(iter.next()); // 1
    * ```
    */
-  repeat: <T>(item: T): Iterator<T> => I.fn(() => item),
+  static repeat<T>(item: T): Iterator<T> {
+    return I.fn(() => item);
+  }
 
   /**
    * Creates an {@linkcode Iterator} where each successive item is computed from
@@ -143,7 +151,7 @@ export const I = {
    * console.log(iter.next()); // 3
    * ```
    */
-  successors: <T>(first: Option<T>, f: (_: T) => Option<T>) => {
+  static successors<T>(first: Option<T>, f: (_: T) => Option<T>) {
     let next = first;
     return I.fn(() => {
       if (O.isSome(next)) {
@@ -154,7 +162,7 @@ export const I = {
         return None;
       }
     });
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that will iterate over two other
@@ -175,12 +183,13 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  zip: <T, U>(iterA: Iterator<T>, iterB: Iterator<U>): Iterator<[T, U]> =>
-    I.fn(() => {
+  static zip<T, U>(iterA: Iterator<T>, iterB: Iterator<U>): Iterator<[T, U]> {
+    return I.fn(() => {
       const nextA = iterA.next();
       const nextB = iterB.next();
       return O.isSome(nextA) && O.isSome(nextB) ? [nextA, nextB] : None;
-    }),
+    });
+  }
 
   /**
    * Creates an {@linkcode Iterator} that will iterate over two other
@@ -199,11 +208,12 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  chain: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<T> =>
-    I.fn(() => {
+  static chain<T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<T> {
+    return I.fn(() => {
       const next = iterA.next();
       return O.isSome(next) ? next : iterB.next();
-    }),
+    });
+  }
 
   /**
    * Creates an {@linkcode Iterator} that calls `f` on each item.
@@ -221,8 +231,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  map: <T, U>(iter: Iterator<T>, f: (_: T) => U): Iterator<U> =>
-    I.fn(() => O.map(iter.next(), f)),
+  static map<T, U>(iter: Iterator<T>, f: (_: T) => U): Iterator<U> {
+    return I.fn(() => O.map(iter.next(), f));
+  }
 
   /**
    * Creates an {@linkcode Iterator} which returns the current iteration as well
@@ -241,10 +252,10 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  enumerate: <T>(iter: Iterator<T>): Iterator<[number, T]> => {
+  static enumerate<T>(iter: Iterator<T>): Iterator<[number, T]> {
     let i = 0;
     return I.map(iter, (item) => [i++, item]);
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that skips the first `n` items.
@@ -261,10 +272,10 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  skip: <T>(iter: Iterator<T>, n: number): Iterator<T> => {
+  static skip<T>(iter: Iterator<T>, n: number): Iterator<T> {
     while (n-- > 0) iter.next();
     return iter;
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that skips items while `f` return `true`.
@@ -281,11 +292,11 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  skipWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> => {
+  static skipWhile<T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> {
     let next = iter.next();
     while (O.isSome(next) && f(next)) next = iter.next();
     return O.isSome(next) ? I.chain(I.once(next), iter) : iter;
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that returns the first `n` items.
@@ -302,8 +313,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  take: <T>(iter: Iterator<T>, n: number): Iterator<T> =>
-    I.fn(() => n-- > 0 ? iter.next() : None),
+  static take<T>(iter: Iterator<T>, n: number): Iterator<T> {
+    return I.fn(() => n-- > 0 ? iter.next() : None);
+  }
 
   /**
    * Creates an {@linkcode Iterator} that returns items while `f` returns
@@ -322,7 +334,7 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  takeWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean) => {
+  static takeWhile<T>(iter: Iterator<T>, f: (_: T) => boolean) {
     let done = false;
     return I.fn(() => {
       const next = iter.next();
@@ -330,7 +342,7 @@ export const I = {
       done = true;
       return None;
     });
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that is {@linkcode Peekable}.
@@ -350,7 +362,7 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  peekable: <T>(iter: Iterator<T>): Peekable<T> => {
+  static peekable<T>(iter: Iterator<T>): Peekable<T> {
     let peeked: Option<T> = None;
     return {
       ...I.fn(() => {
@@ -368,7 +380,7 @@ export const I = {
         return peeked;
       },
     };
-  },
+  }
 
   /**
    * Consumes an {@linkcode Iterator} and runs `f` on each item.
@@ -384,13 +396,13 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  forEach: <T>(iter: Iterator<T>, f: (_: T) => void): void => {
+  static forEach<T>(iter: Iterator<T>, f: (_: T) => void): void {
     while (true) {
       const next = iter.next();
       if (O.isNone(next)) break;
       f(next);
     }
-  },
+  }
 
   /**
    * Consumes an {@linkcode Iterator} and folds every item into an accumulator
@@ -407,11 +419,11 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  fold: <T, U>(iter: Iterator<T>, init: U, f: (_: U, _1: T) => U): U => {
+  static fold<T, U>(iter: Iterator<T>, init: U, f: (_: U, _1: T) => U): U {
     let next = init;
     I.forEach(iter, (item) => next = f(next, item));
     return next;
-  },
+  }
 
   /**
    * Consumes an {@linkcode Iterator} and returns the number of iterations.
@@ -427,8 +439,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  count: <T>(iter: Iterator<T>): number =>
-    I.fold(iter, 0, (count, _) => count + 1),
+  static count<T>(iter: Iterator<T>): number {
+    return I.fold(iter, 0, (count, _) => count + 1);
+  }
 
   /**
    * Consumes an {@linkcode Iterator} and returns the last item.
@@ -444,8 +457,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  last: <T>(iter: Iterator<T>): Option<T> =>
-    I.fold(iter, None as Option<T>, (_, item) => item),
+  static last<T>(iter: Iterator<T>): Option<T> {
+    return I.fold(iter, None as Option<T>, (_, item) => item);
+  }
 
   /**
    * Consumes an {@linkcode Iterator} up to `n` and returns the item.
@@ -462,7 +476,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  nth: <T>(iter: Iterator<T>, n: number): Option<T> => I.skip(iter, n).next(),
+  static nth<T>(iter: Iterator<T>, n: number): Option<T> {
+    return I.skip(iter, n).next();
+  }
 
   /**
    * Consumes an {@linkcode Iterator} until `f` returns `true` and returns the
@@ -480,11 +496,11 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  find: <T>(iter: Iterator<T>, f: (_: T) => boolean): Option<T> => {
+  static find<T>(iter: Iterator<T>, f: (_: T) => boolean): Option<T> {
     let next = iter.next();
     while (O.isSome(next) && !f(next)) next = iter.next();
     return next;
-  },
+  }
 
   /**
    * Creates an {@linkcode Iterator} that returns items when `f` returns `true`.
@@ -501,8 +517,9 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  filter: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
-    I.fn(() => I.find(iter, f)),
+  static filter<T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> {
+    return I.fn(() => I.find(iter, f));
+  }
 
   /**
    * Creates an {@linkcode Iterator} that flattens a layer of nested
@@ -521,10 +538,11 @@ export const I = {
    * console.log(iter.next()); // undefined
    * ```
    */
-  flatten: <T>(iter: Iterator<Iterator<T>>): Iterator<T> =>
-    I.fold(
+  static flatten<T>(iter: Iterator<Iterator<T>>): Iterator<T> {
+    return I.fold(
       iter,
       O.unwrapOr(iter.next(), I.empty()),
       (iterA, iterB) => I.chain(iterA, iterB),
-    ),
-};
+    );
+  }
+}

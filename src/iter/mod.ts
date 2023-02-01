@@ -1,3 +1,5 @@
+// NOTE: we need this to keep `Some` in scope for documentation
+// deno-lint-ignore no-unused-vars
 import { None, O, Option, Some } from "../option/mod.ts";
 
 /** An interface for dealing with iterators. */
@@ -18,7 +20,7 @@ export type Peekable<T> = {
    * {@linkcode Iterator}.
    */
   peek: () => Option<T>;
-};
+} & Iterator<T>;
 
 /** Functionality for {@linkcode Iterator}. */
 export const I = {
@@ -27,16 +29,13 @@ export const I = {
    *
    * ## Examples
    *
-   * Let's re-implement {@linkcode I.repeat} over `1`:
-   *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.fn(() => Some(1));
+   * const iter = I.fn(() => 1);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(1));
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 1
    * // ...
    * ```
    */
@@ -47,8 +46,8 @@ export const I = {
         next: () => {
           const next = this.next();
           return {
-            done: O.isNone(next),
-            value: O.unwrapOr(next, undefined!),
+            done: O.isNone(next) as true,
+            value: next,
           };
         },
       };
@@ -56,99 +55,92 @@ export const I = {
   }),
 
   /**
-   * Converts an {@linkcode Iterable} into an {@linkcode Iterator}.
+   * Creates an {@linkcode Iterator} from an {@linkcode Iterable}.
    *
    * ## Examples
    *
-   * Let's re-implement {@linkcode I.once} over `1`:
-   *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.iter([1]);
+   * const iter = I.iter([1, 2]);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // undefined
    * ```
    */
   iter: <T>(iter: Iterable<T>): Iterator<T> => {
     const iter_ = iter[Symbol.iterator]();
     return I.fn(() => {
       const next = iter_.next();
-      return (next.done ? None : Some(next.value));
+      return next.done ? None : next.value;
     });
   },
 
   /**
-   * Creates an {@linkcode Iterator} that yields nothing.
+   * Creates an {@linkcode Iterator} that returns nothing.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
    * const iter = I.empty();
    *
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // undefined
+   * console.log(iter.next()); // undefined
    * ```
    */
-  empty: (): Iterator<never> => I.fn(() => None),
+  empty: <T>(): Iterator<T> => I.fn(() => None as T),
 
   /**
-   * Creates an {@linkcode Iterator} that yields exactly one item.
+   * Creates an {@linkcode Iterator} that returns exactly one item.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
    * const iter = I.once(1);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // undefined
    * ```
    */
   once: <T>(item: T): Iterator<T> => I.iter([item]),
 
   /**
-   * Creates an {@linkcode Iterator} that endlessly repeats a single item.
+   * Creates an {@linkcode Iterator} that endlessly returns an item.
    *
-   * ## Examples
+   * ## Example
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
    * const iter = I.repeat(1);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(1));
-   * // ...
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 1
    * ```
    */
-  repeat: <T>(item: T): Iterator<T> => I.fn(() => Some(item)),
+  repeat: <T>(item: T): Iterator<T> => I.fn(() => item),
 
   /**
-   * Creates an {@linkcode Iterator} where each successive item is computed
-   * based on the preceding one.
+   * Creates an {@linkcode Iterator} where each successive item is computed from
+   * the preceding one.
    *
    * ## Examples
    *
-   * Let's implement a counter from `0`:
-   *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.successors(Some(0), (i) => Some(i + 1));
+   * const iter = I.successors(0, (i) => i + 1);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(3));
-   * // ...
+   * console.log(iter.next()); // 0
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
    * ```
    */
   successors: <T>(first: Option<T>, f: (_: T) => Option<T>) => {
@@ -156,7 +148,7 @@ export const I = {
     return I.fn(() => {
       if (O.isSome(next)) {
         const item = next;
-        next = f(item.some);
+        next = f(item);
         return item;
       } else {
         return None;
@@ -174,25 +166,20 @@ export const I = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts"
    *
-   * const iter = I.zip(I.iter([1, 2]), I.iter([3, 4]));
+   * const iter = I.zip(I.iter([1, 2]), I.iter(["3", "4", "5"]));
    *
-   * assertEquals(iter.next(), Some([1, 3]));
-   * assertEquals(iter.next(), Some([2, 4]));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // [1, "3"]
+   * console.log(iter.next()); // [2, "4"]
+   * console.log(iter.next()); // undefined
    * ```
    */
-  zip: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<[T, T]> =>
+  zip: <T, U>(iterA: Iterator<T>, iterB: Iterator<U>): Iterator<[T, U]> =>
     I.fn(() => {
       const nextA = iterA.next();
       const nextB = iterB.next();
-      if (O.isSome(nextA) && O.isSome(nextB)) {
-        return Some([O.unwrap(nextA), O.unwrap(nextB)]);
-      } else {
-        return None;
-      }
+      return O.isSome(nextA) && O.isSome(nextB) ? [nextA, nextB] : None;
     }),
 
   /**
@@ -202,66 +189,56 @@ export const I = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.chain(I.iter([1, 2]), I.iter([3, 4]));
+   * const iter = I.chain(I.iter([1, 2]), I.once(3));
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(3));
-   * assertEquals(iter.next(), Some(4));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
   chain: <T>(iterA: Iterator<T>, iterB: Iterator<T>): Iterator<T> =>
     I.fn(() => {
       const next = iterA.next();
-      if (O.isSome(next)) {
-        return next;
-      } else {
-        return iterB.next();
-      }
+      return O.isSome(next) ? next : iterB.next();
     }),
 
   /**
-   * Creates an {@linkcode Iterator} that maps `f` on each item.
-   *
-   * Prefer a `for` loop if there are side-effects.
+   * Creates an {@linkcode Iterator} that calls `f` on each item.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.map(I.iter([1, 2, 3]), (i) => i * 2);
+   * const iter = I.map(I.iter([1, 2, 3]), (i) => i * i);
    *
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(4));
-   * assertEquals(iter.next(), Some(6));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 4
+   * console.log(iter.next()); // 9
+   * console.log(iter.next()); // undefined
    * ```
    */
   map: <T, U>(iter: Iterator<T>, f: (_: T) => U): Iterator<U> =>
     I.fn(() => O.map(iter.next(), f)),
 
   /**
-   * Creates an {@linkcode Iterator} which gives the current iteration as well
-   * the next value.
+   * Creates an {@linkcode Iterator} which returns the current iteration as well
+   * as the next value.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.enumerate(I.iter([1, 2, 3]));
+   * const iter = I.enumerate(I.iter(["hello", "there", "world"]));
    *
-   * assertEquals(iter.next(), Some([0, 2]));
-   * assertEquals(iter.next(), Some([1, 4]));
-   * assertEquals(iter.next(), Some([2, 6]));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // [0, "hello"]
+   * console.log(iter.next()); // [1, "there"]
+   * console.log(iter.next()); // [2, "world"]
+   * console.log(iter.next()); // undefined
    * ```
    */
   enumerate: <T>(iter: Iterator<T>): Iterator<[number, T]> => {
@@ -270,195 +247,125 @@ export const I = {
   },
 
   /**
-   * Creates an {@linkcode Iterator} that flattens a layer of nested
-   * {@linkcode Iterator}s.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
-   *
-   * const iter = I.iter([I.iter([1, 2]), I.iter([3, 4])]);
-   *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(3));
-   * assertEquals(iter.next(), Some(4));
-   * assertEquals(iter.next(), None);
-   * ```
-   */
-  flatten: <T>(iter: Iterator<Iterator<T>>): Iterator<T> =>
-    I.fold(
-      iter,
-      O.unwrapOr(iter.next(), I.empty()),
-      (iterA, iterB) => I.chain(iterA, iterB),
-    ),
-
-  /**
    * Creates an {@linkcode Iterator} that skips the first `n` items.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
    * const iter = I.skip(I.iter([1, 2, 3]), 1);
    *
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(3));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
-  skip: <T>(iter: Iterator<T>, n: number): Iterator<T> =>
-    I.fn(() => {
-      while (n-- > 0) {
-        iter.next();
-      }
-      return iter.next();
-    }),
+  skip: <T>(iter: Iterator<T>, n: number): Iterator<T> => {
+    while (n-- > 0) iter.next();
+    return iter;
+  },
 
   /**
-   * Creates an {@linkcode Iterator} that skips items while `f` returns `true`.
+   * Creates an {@linkcode Iterator} that skips items while `f` return `true`.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.skipWhile(I.iter([1, 2, 3]), (i) => i % 2 === 0);
+   * const iter = I.skipWhile(I.iter([1, 3, 2, 3]), (i) => i % 2 !== 0);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(3));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
-  skipWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
-    I.fn(() => {
-      let next = iter.next();
-      while (O.isSome(next) && f(next.some)) {
-        next = iter.next();
-      }
-      return next;
-    }),
+  skipWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> => {
+    let next = iter.next();
+    while (O.isSome(next) && f(next)) next = iter.next();
+    return O.isSome(next) ? I.chain(I.once(next), iter) : iter;
+  },
 
   /**
-   * Creates an {@linkcode Iterator} than yields the first `n` items.
+   * Creates an {@linkcode Iterator} that returns the first `n` items.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
    * const iter = I.take(I.iter([1, 2, 3]), 2);
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // undefined
    * ```
    */
   take: <T>(iter: Iterator<T>, n: number): Iterator<T> =>
-    I.fn(() => {
-      if (n-- > 0) {
-        return iter.next();
-      }
-      return None;
-    }),
+    I.fn(() => n-- > 0 ? iter.next() : None),
 
   /**
-   * Creates an {@linkcode Iterator} than yields items while `f` returns `true`.
+   * Creates an {@linkcode Iterator} that returns items while `f` returns
+   * `true`.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.takeWhile(I.iter([1, 2, 3]), (i) => i % 2 === 0);
+   * const iter = I.takeWhile(I.iter([4, 2, 3, 4]), (i) => i % 2 === 0);
    *
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 4
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // undefined
+   * console.log(iter.next()); // undefined
    * ```
    */
-  takeWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
-    I.fn(() => {
+  takeWhile: <T>(iter: Iterator<T>, f: (_: T) => boolean) => {
+    let done = false;
+    return I.fn(() => {
       const next = iter.next();
-      if (O.isSome(next) && f(next.some)) {
-        return next;
-      }
+      if (!done && O.isSome(next) && f(next)) return next;
+      done = true;
       return None;
-    }),
+    });
+  },
 
   /**
-   * Creates an {@linkcode Iterator} that yields items when `f` returns `true`.
+   * Creates an {@linkcode Iterator} that is {@linkcode Peekable}.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
-   *
-   * const iter = I.filter(I.iter([1, 2, 3]), (i) => i < 1);
-   *
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(3));
-   * assertEquals(iter.next(), None);
-   * ```
-   */
-  filter: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
-    I.fn(() => I.find(iter, f)),
-
-  /**
-   * Creates an {@linkcode Iterator} that is also {@linkcode Peekable}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
    * const iter = I.peekable(I.iter([1, 2, 3]));
    *
-   * assertEquals(iter.next(), Some(1));
-   * assertEquals(iter.peek(), Some(2));
-   * assertEquals(iter.next(), Some(2));
-   * assertEquals(iter.next(), Some(3));
-   * assertEquals(iter.next(), None);
+   * console.log(iter.next()); // 1
+   * console.log(iter.peek()); // 2
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.peek()); // undefined
+   * console.log(iter.next()); // undefined
    * ```
    */
-  peekable: <T>(iter: Iterator<T>): Iterator<T> & Peekable<T> => {
+  peekable: <T>(iter: Iterator<T>): Peekable<T> => {
     let peeked: Option<T> = None;
     return {
-      next: () => {
+      ...I.fn(() => {
         if (O.isSome(peeked)) {
           const tmp = peeked;
           peeked = None;
           return tmp;
-        } else {
-          return iter.next();
         }
-      },
+        return iter.next();
+      }),
       peek: () => {
-        if (O.isSome(peeked)) {
-          return peeked;
-        } else {
+        if (O.isNone(peeked)) {
           peeked = iter.next();
-          return peeked;
         }
-      },
-      [Symbol.iterator](): globalThis.Iterator<T> {
-        return {
-          next: () => {
-            const next = this.next();
-            return {
-              done: O.isNone(next),
-              value: O.unwrapOr(next, undefined!),
-            };
-          },
-        };
+        return peeked;
       },
     };
   },
@@ -466,52 +373,43 @@ export const I = {
   /**
    * Consumes an {@linkcode Iterator} and runs `f` on each item.
    *
-   * Prefer a `for` loop if there are side-effects.
-   *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * let j = 1;
+   * const iter = I.iter([1, 2, 3]);
    *
-   * I.forEach(I.iter([1, 2, 3]), (i) => {
-   *   assertEquals(i, j++);
-   * });
+   * I.forEach(iter, (i) => console.log(i));
+   * console.log(iter.next()); // undefined
    * ```
    */
   forEach: <T>(iter: Iterator<T>, f: (_: T) => void): void => {
     while (true) {
       const next = iter.next();
-      if (O.isSome(next)) {
-        f(next.some);
-      } else {
-        break;
-      }
+      if (O.isNone(next)) break;
+      f(next);
     }
   },
 
   /**
-   * Consumes an {@linkcode Iterator} and folds every item with the next into an
-   * accumulator using  `f`.
+   * Consumes an {@linkcode Iterator} and folds every item into an accumulator
+   * using `f`.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const i = I.fold(I.iter([1, 2, 3]), 0, (a, i) => a + i);
+   * const iter = I.iter([1, 2, 3]);
    *
-   * assertEquals(i, 6);
+   * console.log(I.fold(iter, 0, (a, b) => a + b)); // 6
+   * console.log(iter.next()); // undefined
    * ```
    */
   fold: <T, U>(iter: Iterator<T>, init: U, f: (_: U, _1: T) => U): U => {
     let next = init;
-    I.forEach(iter, (item) => {
-      next = f(next, item);
-    });
+    I.forEach(iter, (item) => next = f(next, item));
     return next;
   },
 
@@ -521,12 +419,12 @@ export const I = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const i = I.count(I.iter([1, 2, 3]));
+   * const iter = I.iter(["hello", "there", "world"]);
    *
-   * assertEquals(i, 3);
+   * console.log(I.count(iter)); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
   count: <T>(iter: Iterator<T>): number =>
@@ -538,56 +436,95 @@ export const I = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const i = I.last(I.iter([1, 2, 3]));
+   * const iter = I.iter([1, 2, 3]);
    *
-   * assertEquals(i, Some(3));
+   * console.log(I.last(iter)); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
   last: <T>(iter: Iterator<T>): Option<T> =>
-    I.fold(iter, None as Option<T>, (_, item) => Some(item)),
+    I.fold(iter, None as Option<T>, (_, item) => item),
 
   /**
-   * Returns the `n` item from an {@linkcode Iterator}.
+   * Consumes an {@linkcode Iterator} up to `n` and returns the item.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const iter = I.iter([1, 2, 3, 4]);
+   * const iter = I.iter([1, 2, 3]);
    *
-   * assertEquals(I.nth(iter, 0), Some(1));
-   * assertEquals(I.nth(iter, 0), Some(2));
-   * assertEquals(I.nth(iter, 1), Some(4));
-   * assertEquals(I.nth(iter, 0), None);
+   * console.log(I.nth(iter, 1)); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
   nth: <T>(iter: Iterator<T>, n: number): Option<T> => I.skip(iter, n).next(),
 
   /**
-   * Returns the first item in an {@linkcode Iterator} that `f` returns `true`
-   * for.
+   * Consumes an {@linkcode Iterator} until `f` returns `true` and returns the
+   * item.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { I, Some, None } from "../../mod.ts";
+   * import { I } from "./mod.ts";
    *
-   * const i = I.find(I.iter([1, 2, 3, 4]), (i) => i % 2 === 0);
+   * const iter = I.iter([1, 2, 3]);
    *
-   * assertEquals(i, Some(2));
+   * console.log(I.find(iter, (i) => i > 1)); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
    * ```
    */
   find: <T>(iter: Iterator<T>, f: (_: T) => boolean): Option<T> => {
     let next = iter.next();
-    while (O.isSome(next) && !f(next.some)) {
-      next = iter.next();
-    }
+    while (O.isSome(next) && !f(next)) next = iter.next();
     return next;
   },
+
+  /**
+   * Creates an {@linkcode Iterator} that returns items when `f` returns `true`.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { I } from "./mod.ts";
+   *
+   * const iter = I.filter(I.iter([1, 2, 3, 4]), (i) => i % 2 === 0);
+   *
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 4
+   * console.log(iter.next()); // undefined
+   * ```
+   */
+  filter: <T>(iter: Iterator<T>, f: (_: T) => boolean): Iterator<T> =>
+    I.fn(() => I.find(iter, f)),
+
+  /**
+   * Creates an {@linkcode Iterator} that flattens a layer of nested
+   * {@linkcode Iterator}s.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { I } from "./mod.ts";
+   *
+   * const iter = I.flatten(I.iter([I.once(1), I.empty(), I.iter([2, 3])]));
+   *
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
+   * ```
+   */
+  flatten: <T>(iter: Iterator<Iterator<T>>): Iterator<T> =>
+    I.fold(
+      iter,
+      O.unwrapOr(iter.next(), I.empty()),
+      (iterA, iterB) => I.chain(iterA, iterB),
+    ),
 };

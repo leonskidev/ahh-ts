@@ -1,29 +1,22 @@
 # Ahh
 
-A collection of mostly rust-inspired stuff to help make TypeScript a litte
-easier to work with &mdash; if you don't mind a little verbosity.
-
-## Example
-
-Here's a quick example of how you might use a few of this module's goodies:
-
-```ts
-import { I, Some } from "./mod.ts";
-
-const len = 5;
-const iter = I.map(I.successors(Some(0), (n) => Some(n + 1)), (n) => n * 2);
-
-for (const n of I.take(iter, len)) {
-  console.log(n);
-}
-```
+**Ahh** is a set of idiomatic type-safety structures that are borrowed from
+other languages. While it can make your code more verbose in certain areas, it
+also helps to keep it working as intended.
 
 ## Licence
 
-All code in this repository is dual-licenced under either:
+All code in this project is dual-licenced under either:
 
-- MIT Licence ([LICENCE](./LICENCE-MIT) or https://opensource.org/licenses/MIT)
-- Apache Licence, Version 2.0 ([LICENCE](./LICENCE-APACHE) or
-  http://www.apache.org/licenses/LICENSE-2.0)
+- MIT Licence ([LICENCE-MIT](./LICENCE-MIT) or
+  https://opensource.org/licenses/MIT)
+- Apache Licence, Version 2.0 ([LICENCE-APACHE](./LICENCE-APACHE) or
+  https://www.apache.org/licenses/LICENSE-2.0)
 
-at your option. This means you can select the licence you prefer!
+at your option.
+
+### Contributions
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 licence, shall be
+dual licenced as above, without any additional terms or conditions.

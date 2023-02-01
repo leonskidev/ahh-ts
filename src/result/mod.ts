@@ -1,43 +1,52 @@
-import { None, O, Option, Some } from "../option/mod.ts";
+import { None, Option } from "../option/mod.ts";
 
 /** Represents a {@linkcode Result} that was erroneous. */
-export type Err<E> = Readonly<{ err: E }>;
+export type Err<E extends Error> = E;
 /** Represents a {@linkcode Result} that was successful. */
-export type Ok<T> = Readonly<{ ok: T }>;
+export type Ok<T> = T;
 /**
  * Represents a value that is either successful ({@linkcode Ok}) or erroneous
  * ({@linkcode Err}).
  */
-export type Result<T, E> = Err<E> | Ok<T>;
-
-export function Err<T, E>(v: E): Result<T, E> {
-  return Object.defineProperties({ err: v }, {
-    toString: { value: (): string => `Err(${v})` },
-  });
-}
-
-export function Ok<T, E>(v: T): Result<T, E> {
-  return Object.defineProperties({ ok: v }, {
-    toString: { value: (): string => `Ok(${v})` },
-  });
-}
+export type Result<T, E extends Error> = Err<E> | Ok<T>;
 
 /** Functionality for {@linkcode Result}. */
 export const R = {
+  /**
+   * Creates an {@linkcode Ok} from the return value of `f`, otherwise an
+   * {@linkcode Err} if it throws.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { R } from "./mod.ts";
+   *
+   * console.log(R.fn(() => 1)); // 1
+   * console.log(R.fn(() => { throw Error(); })); // Error()
+   * ```
+   */
+  fn: <T, E extends Error>(f: () => T): Result<T, E> => {
+    try {
+      return f();
+    } catch (e) {
+      return e;
+    }
+  },
+
   /**
    * Returns whether a {@linkcode Result} is an {@linkcode Ok}.
    *
    * ## Examples
    *
    * ```ts
-   * import { assert } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assert(R.isOk(Ok(1)));
-   * assert(!R.isOk(Err(0)));
+   * console.log(R.isOk(1)); // true
+   * console.log(R.isOk(Error())); // false
    * ```
    */
-  isOk: <T, E>(r: Result<T, E>): r is Ok<T> => Object.hasOwn(r, "ok"),
+  isOk: <T, E extends Error>(r: Result<T, E>): r is Ok<T> =>
+    !(r instanceof Error),
 
   /**
    * Returns whether a {@linkcode Result} is an {@linkcode Err}.
@@ -45,14 +54,14 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assert } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assert(!R.isErr(Ok(1)));
-   * assert(R.isErr(Err(0)));
+   * console.log(R.isErr(1)); // false
+   * console.log(R.isErr(Error())); // true
    * ```
    */
-  isErr: <T, E>(r: Result<T, E>): r is Err<E> => Object.hasOwn(r, "err"),
+  isErr: <T, E extends Error>(r: Result<T, E>): r is Err<E> =>
+    r instanceof Error,
 
   /**
    * Returns the contained {@linkcode Ok} value.
@@ -63,19 +72,19 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals, assertThrows } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.expect(Ok(1), "fine"), 1);
-   * assertThrows(R.expect(Err(0), "whoops"));
+   * console.log(R.expect(1, "returns")); // 1
+   * R.expect(Error("whoops"), "throws"); // throws
    * ```
    */
-  expect: <T, E>(
+  expect: <T, E extends Error>(
     r: Result<T, E>,
     message: string,
-  ): (typeof r) extends Err<E> ? never : T => {
-    if (R.isOk(r)) return r.ok;
-    throw Error(message);
+  ): typeof r extends Ok<T> ? T : never => {
+    if (R.isErr(r)) throw Error(message);
+    // TODO: why? also fix this
+    return r as never;
   },
 
   /**
@@ -87,19 +96,19 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals, assertThrows } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertThrows(R.expectErr(Ok(1), "whoops"));
-   * assertEquals(R.expectErr(Err(0), "fine"), 0);
+   * console.log(R.expectErr(Error("whoops"), "returns")); // Error("whoops")
+   * R.expectErr(1, "throws"); // throws
    * ```
    */
-  expectErr: <T, E>(
+  expectErr: <T, E extends Error>(
     r: Result<T, E>,
     message: string,
-  ): (typeof r) extends Ok<T> ? never : E => {
-    if (R.isErr(r)) return r.err;
-    throw Error(`${message}: ${r.ok}`);
+  ): typeof r extends Err<E> ? E : never => {
+    if (R.isOk(r)) throw Error(message);
+    // TODO: why? also fix this
+    return r as never;
   },
 
   /**
@@ -110,17 +119,18 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals, assertThrows } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.unwrap(Ok(1)), 1);
-   * assertThrows(R.unwrap(Err(0)));
+   * console.log(R.unwrap(1)); // 1
+   * R.unwrap(Error("whoops")); // throws
    * ```
    */
-  unwrap: <T, E>(r: Result<T, E>): (typeof r) extends Err<E> ? never : T =>
+  unwrap: <T, E extends Error>(
+    r: Result<T, E>,
+  ): typeof r extends Ok<T> ? T : never =>
     R.expect(
       r,
-      `called \`unwrap()\` on an \`Err\` value: ${(r as Err<E>).err}`,
+      `called \`unwrap()\` on an \`Err\` value: ${(r as Err<E>).message}`,
     ),
 
   /**
@@ -131,17 +141,18 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals, assertThrows } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertThrows(R.unwrapErr(Ok(1)));
-   * assertEquals(R.unwrapErr(Err(0)), 0);
+   * console.log(R.unwrapErr(Error("whoops"))); // Error("whoops")
+   * R.unwrapErr(1); // throws
    * ```
    */
-  unwrapErr: <T, E>(r: Result<T, E>): (typeof r) extends Ok<T> ? never : E =>
+  unwrapErr: <T, E extends Error>(
+    r: Result<T, E>,
+  ): typeof r extends Err<E> ? E : never =>
     R.expectErr(
       r,
-      `called \`unwrapErr()\` on an \`Ok\` value: ${(r as Ok<T>).ok}`,
+      `called \`unwrapErr()\` on an \`Ok\` value: ${(r as Ok<T>)}`,
     ),
 
   /**
@@ -150,145 +161,84 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.unwrapOr(Ok(1), 5), 1);
-   * assertEquals(R.unwrapOr(Err(0), 5), 5);
+   * console.log(R.unwrapOr<number, Error>(1, 5)); // 1
+   * console.log(R.unwrapOr(Error("whoops"), 5)); // 5
    * ```
    */
-  unwrapOr: <T, E>(r: Result<T, E>, default_: T): T =>
-    R.isOk(r) ? r.ok : default_,
+  unwrapOr: <T, E extends Error>(r: Result<T, E>, v: T): T => R.isOk(r) ? r : v,
 
   /**
-   * Returns the contained {@linkcode Err} value or the provided `default`.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
-   *
-   * assertEquals(R.unwrapErrOr(Ok(1), 5), 5);
-   * assertEquals(R.unwrapErrOr(Err(0), 5), 0);
-   * ```
-   */
-  unwrapErrOr: <T, E>(r: Result<T, E>, default_: E): E =>
-    R.isErr(r) ? r.err : default_,
-
-  /**
-   * Maps the contained {@linkcode Ok} value with `f`, or returns
+   * Maps the contained {@linkcode Ok} value with `f`, otherwise
    * {@linkcode Err}.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.map(Ok<number, number>(1), (i) => i + 1), Ok(2));
-   * assertEquals(R.map(Err<number, number>(0), (i) => i + 1), Err(0));
+   * console.log(R.map(1, (i) => i + 1)); // 2
+   * console.log(R.map<number, Error, number>(Error("whoops"), (i) => i + 1)); // Error("whoops")
    * ```
    */
-  map: <T, E, U>(r: Result<T, E>, f: (_: T) => U): Result<U, E> =>
-    R.isOk(r) ? Ok(f(r.ok)) : r,
+  map: <T, E extends Error, U>(r: Result<T, E>, f: (_: T) => U): Result<U, E> =>
+    R.isOk(r) ? f(r) : r,
 
   /**
-   * Maps the contained {@linkcode Err} value with `f`, or returns
+   * Maps the contained {@linkcode Err} value with `f`, otherwise
    * {@linkcode Ok}.
    *
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.mapErr(Ok<number, number>(1), (i) => i + 1), Ok(1));
-   * assertEquals(R.mapErr(Err<number, number>(0), (i) => i + 1), Err(1));
+   * console.log(R.mapErr(1, (i) => Error(i.message + "bar"))); // 1
+   * console.log(R.mapErr(Error("foo"), (i) => Error(i.message + "bar"))); // Error("foobar")
    * ```
    */
-  mapErr: <T, E, F>(r: Result<T, E>, f: (_: E) => F): Result<T, F> =>
-    R.isErr(r) ? Err(f(r.err)) : r,
+  mapErr: <T, E extends Error, F extends Error>(
+    r: Result<T, E>,
+    f: (_: E) => F,
+  ): Result<T, F> => R.isErr(r) ? f(r) : r,
 
   /**
-   * Returns whether the contained {@linkcode Ok} value strictly equals `cmp`.
+   * Returns whether the contained {@linkcode Ok} value strictly equals `v`.
    *
    * ## Examples
    *
    * ```ts
-   * import { assert } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assert(R.contains(Ok(1), 1));
-   * assert(!R.contains(Ok(1), 5));
-   * assert(!R.contains(Err(0), 0));
+   * console.log(R.contains(1, 1)); // true
+   * console.log(R.contains(1, 2)); // false
+   * console.log(R.contains(Error("whoops"), 1)); // false
    * ```
    */
-  contains: <T, E>(r: Result<T, E>, cmp: T): boolean =>
-    R.isOk(r) ? r.ok === cmp : false,
+  contains: <T, E extends Error>(r: Result<T, E>, v: T): boolean =>
+    R.isOk(r) ? r === v : false,
 
   /**
-   * Returns whether the contained {@linkcode Err} value strictly equals `cmp`.
+   * Returns whether the contained {@linkcode Err} value strictly equals `v`.
+   *
+   * This checks all fields except for `stack` which is usually the desired
+   * behaviour.
    *
    * ## Examples
    *
    * ```ts
-   * import { assert } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assert(!R.contains(Ok(1), 1));
-   * assert(R.contains(Err(0), 0));
-   * assert(!R.contains(Err(0), 5));
+   * console.log(R.containsErr(Error("whoops"), Error("whoops"))); // true
+   * console.log(R.containsErr(Error("whoops"), Error("spoohw"))); // false
+   * console.log(R.containsErr(1, Error("whoops"))); // false
    * ```
    */
-  containsErr: <T, E>(r: Result<T, E>, cmp: E): boolean =>
-    R.isErr(r) ? r.err === cmp : false,
-
-  /**
-   * Returns the contained {@linkcode Result} value of an {@linkcode Ok}, or
-   * returns {@linkcode Err}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err } from "../../mod.ts";
-   *
-   * assertEquals(R.flatten(Ok(Ok(1))), Ok(1));
-   * assertEquals(R.flatten(Ok(Err(1))), Err(1));
-   * assertEquals(R.flatten(Err(0)), Err(0));
-   * ```
-   */
-  flatten: <T, E>(r: Result<Result<T, E>, E>): Result<T, E> =>
-    R.isOk(r) ? r.ok : r,
-
-  /**
-   * Returns the contained {@linkcode Ok} value, but never throws.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok } from "../../mod.ts";
-   *
-   * assertEquals(R.intoOk(Ok(1)), 1);
-   * ```
-   */
-  intoOk: <T>(r: Result<T, never>): T => (r as Ok<T>).ok,
-
-  /**
-   * Returns the contained {@linkcode Err} value, but never throws.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Err } from "../../mod.ts";
-   *
-   * assertEquals(R.intoErr(Err(1)), 1);
-   * ```
-   */
-  intoErr: <E>(r: Result<never, E>): E => (r as Err<E>).err,
+  containsErr: <T, E extends Error>(r: Result<T, E>, v: E): boolean =>
+    R.isErr(r)
+      ? r.name === v.name && r.cause === v.cause && r.message === v.message
+      : false,
 
   /**
    * Converts an {@linkcode Ok} into an {@linkcode Option}.
@@ -296,14 +246,13 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err, Some, None } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.ok(Ok(1)), Some(1));
-   * assertEquals(R.ok(Err(0)), None);
+   * console.log(R.ok(1)); // 1
+   * console.log(R.ok(Error("whoops"))); // undefined
    * ```
    */
-  ok: <T, E>(r: Result<T, E>): Option<T> => R.isOk(r) ? Some(r.ok) : None,
+  ok: <T, E extends Error>(r: Result<T, E>): Option<T> => R.isOk(r) ? r : None,
 
   /**
    * Converts an {@linkcode Err} into an {@linkcode Option}.
@@ -311,31 +260,12 @@ export const R = {
    * ## Examples
    *
    * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err, Some, None } from "../../mod.ts";
+   * import { R } from "./mod.ts";
    *
-   * assertEquals(R.err(Ok(1)), None);
-   * assertEquals(R.err(Err(0)), Some(0));
+   * console.log(R.err(Error("whoops"))); // Error("whoops")
+   * console.log(R.err(1)); // undefined
    * ```
    */
-  err: <T, E>(r: Result<T, E>): Option<E> => R.isErr(r) ? Some(r.err) : None,
-
-  /**
-   * Transposes a {@linkcode Result} of an {@linkcode Option} into an
-   * {@linkcode Option} of a {@linkcode Result}.
-   *
-   * ## Examples
-   *
-   * ```ts
-   * import { assertEquals } from "../../test_deps.ts";
-   * import { R, Ok, Err, Some, None } from "../../mod.ts";
-   *
-   * assertEquals(R.transpose(Ok(Some(1))), Some(Ok(1)));
-   * assertEquals(R.transpose(Ok(None)), None);
-   * assertEquals(R.transpose(Err(Some(0))), Some(Err(0)));
-   * assertEquals(R.transpose(Err(None)), None);
-   * ```
-   */
-  transpose: <T, E>(r: Result<Option<T>, E>): Option<Result<T, E>> =>
-    R.isOk(r) ? (O.isSome(r.ok) ? Some(Ok(r.ok.some)) : r.ok) : Some(r),
+  err: <T, E extends Error>(r: Result<T, E>): Option<E> =>
+    R.isErr(r) ? r : None,
 };

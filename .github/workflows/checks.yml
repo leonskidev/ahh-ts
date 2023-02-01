@@ -8,23 +8,23 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
 
-      - name: Formatting
+      - name: Format
         run: deno fmt --check
 
-      - name: Linting
+      - name: Lint
         run: deno lint
 
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -32,4 +32,4 @@ jobs:
           deno-version: v1.x
 
       - name: Test
-        run: deno test --allow-none --doc
+        run: deno test --check=all --doc --allow-none

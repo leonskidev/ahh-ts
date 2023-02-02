@@ -123,7 +123,7 @@ export class O {
    * import { O, None } from "./mod.ts";
    *
    * console.log(O.unwrap(1)); // 1
-   * O.unwrap(None); // throws "Error: attempted to unwrap a `None` value"
+   * O.unwrap(None); // throws
    * ```
    */
   static unwrap<T>(opt: Option<T>): typeof opt extends Some<T> ? T : never {

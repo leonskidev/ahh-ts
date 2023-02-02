@@ -46,7 +46,7 @@ export class O {
 
   /**
    * Returns whether {@linkcode opt} strictly equals {@linkcode value}, or
-   * `false` if it is {@linkcode None}.
+   * `false` if it is an {@linkcode None}.
    *
    * ## Examples
    *
@@ -150,7 +150,7 @@ export class O {
   }
 
   /**
-   * Return {@linkcode opt} if it is {@linkcode Some}, or {@linkcode other}.
+   * Return {@linkcode opt} if it is a {@linkcode Some}, or {@linkcode other}.
    *
    * ## Examples
    *

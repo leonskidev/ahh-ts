@@ -158,6 +158,8 @@ export class O {
    *
    * console.log(O.or(1, 2)); // 1
    * console.log(O.or(None, 2)); // 2
+   * console.log(O.or(2, None)); // 2
+   * console.log(O.or(None, None)); // undefined
    * ```
    */
   static or<T>(opt: Option<T>, other: Option<T>): Option<T> {
@@ -173,8 +175,10 @@ export class O {
    * ```ts
    * import { O, None } from "./mod.ts";
    *
-   * console.log(O.or(1, 2)); // 2
-   * console.log(O.or(None, 2)); // None
+   * console.log(O.and(1, 2)); // 2
+   * console.log(O.and(None, 2)); // None
+   * console.log(O.and(2, None)); // None
+   * console.log(O.and(None, None)); // None
    * ```
    */
   static and<T, U>(opt: Option<T>, other: Option<U>): Option<U> {

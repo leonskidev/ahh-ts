@@ -11,11 +11,40 @@ Deno.test("is_none", async (t) => {
   await t.step("none", () => assert(O.isNone(None)));
 });
 
-Deno.test("expect", async (t) => {
-  await t.step("some", () => assertStrictEquals(O.expect(1, "returns"), 1));
+Deno.test("contains", async (t) => {
+  await t.step("some_equals", () => assert(O.contains(1, 1)));
+  await t.step("some_not_equals", () => assert(!O.contains(1, 2)));
+  await t.step("none", () => assert(!O.contains(None, 1)));
+});
+
+Deno.test("inspect", async (t) => {
+  await t.step("some", () => assertStrictEquals(O.inspect(1, (i) => i + 1), 1));
   await t.step(
     "none",
-    () => void assertThrows(() => O.expect(None, "throws"), Error, "throws"),
+    () => assertStrictEquals(O.inspect(None, (i: number) => i + 1), None),
+  );
+});
+
+Deno.test("map", async (t) => {
+  await t.step("some", () => assertStrictEquals(O.map(1, (i) => i + 1), 2));
+  await t.step(
+    "none",
+    () => assertStrictEquals(O.map(None, (i: number) => i + 1), None),
+  );
+});
+
+Deno.test("filter", async (t) => {
+  await t.step(
+    "some_equals",
+    () => assertStrictEquals(O.filter(2, (i) => i % 2 === 0), 2),
+  );
+  await t.step(
+    "some_not_equals",
+    () => assertStrictEquals(O.filter(1, (i) => i % 2 === 0), None),
+  );
+  await t.step(
+    "none",
+    () => assertStrictEquals(O.filter(None, (i: number) => i % 2 === 0), None),
   );
 });
 
@@ -27,26 +56,22 @@ Deno.test("unwrap", async (t) => {
       void assertThrows(
         () => O.unwrap(None),
         Error,
-        "called `unwrap()` on a `None` value",
+        "attempted to unwrap a `None` value",
       ),
   );
 });
 
 Deno.test("unwrap_or", async (t) => {
-  await t.step("some", () => assertStrictEquals(O.unwrapOr(1, 5), 1));
-  await t.step("none", () => assertStrictEquals(O.unwrapOr(None, 5), 5));
+  await t.step("some", () => assertStrictEquals(O.unwrapOr(1, 2), 1));
+  await t.step("none", () => assertStrictEquals(O.unwrapOr(None, 2), 2));
 });
 
-Deno.test("map", async (t) => {
-  await t.step("some", () => assertStrictEquals(O.map(1, (i) => i + 1), 2));
-  await t.step(
-    "some",
-    () => assertStrictEquals(O.map<number, number>(None, (i) => i + 1), None),
-  );
+Deno.test("or", async (t) => {
+  await t.step("some", () => assertStrictEquals(O.or(1, 2), 1));
+  await t.step("none", () => assertStrictEquals(O.or(None, 2), 2));
 });
 
-Deno.test("contains", async (t) => {
-  await t.step("some_equals", () => assert(O.contains(1, 1)));
-  await t.step("some_not_equals", () => assert(!O.contains(1, 2)));
-  await t.step("none", () => assert(!O.contains(None, 1)));
+Deno.test("and", async (t) => {
+  await t.step("some", () => assertStrictEquals(O.and(1, 2), 2));
+  await t.step("none", () => assertStrictEquals(O.and(None, 2), None));
 });

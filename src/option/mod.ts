@@ -115,8 +115,7 @@ export class O {
   }
 
   /**
-   * Returns {@linkcode opt} if it is a {@linkcode Some}, or throws with
-   * {@linkcode message} if provided.
+   * Returns {@linkcode opt} if it is a {@linkcode Some}, or throws.
    *
    * ## Examples
    *

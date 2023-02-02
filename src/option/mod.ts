@@ -1,3 +1,5 @@
+import { Result } from "../result/mod.ts";
+
 /** Represents an {@linkcode Option} that does not exist. */
 export type None = undefined | null;
 /** Represents an {@linkcode Option} that does exist. */
@@ -183,5 +185,22 @@ export class O {
    */
   static and<T, U>(opt: Option<T>, other: Option<U>): Option<U> {
     return O.isNone(opt) ? None : other;
+  }
+
+  /**
+   * Converts {@linkcode opt} into an {@linkcode Ok} if it is a
+   * {@linkcode Some}.
+   *
+   * ## Examples
+   *
+   * ```ts
+   * import { O, None } from "./mod.ts";
+   *
+   * console.log(O.okOr(1, Error())); // 1
+   * console.log(O.okOr(None, Error())); // Error()
+   * ```
+   */
+  static okOr<T, E extends Error>(opt: Option<T>, err: E): Result<T, E> {
+    return O.isSome(opt) ? opt : err;
   }
 }

@@ -75,3 +75,9 @@ Deno.test("and", async (t) => {
   await t.step("some", () => assertStrictEquals(O.and(1, 2), 2));
   await t.step("none", () => assertStrictEquals(O.and(None, 2), None));
 });
+
+Deno.test("ok_or", async (t) => {
+  const ERROR = Error();
+  await t.step("some", () => assertStrictEquals(O.okOr(1, ERROR), 1));
+  await t.step("none", () => assertStrictEquals(O.okOr(None, ERROR), ERROR));
+});

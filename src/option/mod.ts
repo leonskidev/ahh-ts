@@ -129,7 +129,7 @@ export class O {
    */
   static unwrap<T>(opt: Option<T>): typeof opt extends Some<T> ? T : never {
     if (O.isSome(opt)) return opt as never;
-    throw Error("attempted to unwrap a \`None\` value");
+    throw Error("attempted to unwrap a `None` value");
   }
 
   /**

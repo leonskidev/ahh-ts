@@ -75,7 +75,7 @@ export class O {
    * console.log(O.inspect(None, (i: number) => i + 1)); // undefined
    * ```
    */
-  static inspect<T>(opt: Option<T>, f: (_: T) => void): Option<T> {
+  static inspect<T>(opt: Option<T>, f: (_: T) => unknown): Option<T> {
     if (O.isSome(opt)) f(opt);
     return opt;
   }

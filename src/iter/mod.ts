@@ -78,7 +78,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that returns nothing.
+   * Creates an {@linkcode Iterator} that yields nothing.
    *
    * @example
    * ```ts
@@ -95,7 +95,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that returns exactly one item.
+   * Creates an {@linkcode Iterator} that yields exactly one item.
    *
    * @example
    * ```ts
@@ -112,7 +112,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that endlessly returns an item.
+   * Creates an {@linkcode Iterator} that endlessly yields an item.
    *
    * ## Example
    *
@@ -160,7 +160,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that will iterate over two other
+   * Creates an {@linkcode Iterator} that iterates over two other
    * {@linkcode Iterator}s simultaneously.
    *
    * If either {@linkcode Iterator} returns {@linkcode None}, so will this
@@ -186,7 +186,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that will iterate over two other
+   * Creates an {@linkcode Iterator} that iterates over two other
    * {@linkcode Iterator}s sequentially.
    *
    * @example
@@ -209,7 +209,8 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that calls `f` on each item.
+   * Creates an {@linkcode Iterator} that calls `f` on each item and yeilds the
+   * result.
    *
    * @example
    * ```ts
@@ -228,7 +229,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} which returns the current iteration as well
+   * Creates an {@linkcode Iterator} which yields the current iteration as well
    * as the next value.
    *
    * @example
@@ -268,7 +269,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that skips items while `f` return `true`.
+   * Creates an {@linkcode Iterator} that skips items while `f` returns `true`.
    *
    * @example
    * ```ts
@@ -288,7 +289,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that returns the first `n` items.
+   * Creates an {@linkcode Iterator} that yields the first `n` items.
    *
    * @example
    * ```ts
@@ -306,8 +307,7 @@ export class I {
   }
 
   /**
-   * Creates an {@linkcode Iterator} that returns items while `f` returns
-   * `true`.
+   * Creates an {@linkcode Iterator} that yields items while `f` returns `true`.
    *
    * @example
    * ```ts
@@ -369,7 +369,7 @@ export class I {
   }
 
   /**
-   * Consumes an {@linkcode Iterator} and runs `f` on each item.
+   * Consumes an {@linkcode Iterator} and calls `f` on each item.
    *
    * @example
    * ```ts
@@ -390,8 +390,8 @@ export class I {
   }
 
   /**
-   * Consumes an {@linkcode Iterator} and folds every item into an accumulator
-   * using `f`.
+   * Consumes an {@linkcode Iterator} and calls `f` on each item to fold it into
+   * `init`.
    *
    * @example
    * ```ts

@@ -51,13 +51,13 @@ to explicitly catch. And that's all **Ahh** does, fill in those gaps to make
 this much easier:
 
 ```ts
-import { O, Option, R, Result } from "./mod.ts";
+import { None, O, Option, R, Result } from "./mod.ts";
 
 // no changes here; apart from removing the unnecessary typing
 const input = prompt("URL:");
 
 // so much easier
-const url = input ? R.fn(() => new URL(input)) : null;
+const url = O.isSome(input) ? R.fn(() => new URL(input)) : None;
 
 // we can even go a step further
 const url2 = O.map(prompt("URL:"), (url) => R.fn(() => new URL(url)));

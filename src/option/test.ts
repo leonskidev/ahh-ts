@@ -1,5 +1,5 @@
 import { assert, assertStrictEquals, assertThrows } from "../../test_deps.ts";
-import { None, O } from "./mod.ts";
+import { default as O, None } from "./mod.ts";
 
 Deno.test("is_some", async (t) => {
   await t.step("some", () => assert(O.isSome(1)));

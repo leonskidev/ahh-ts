@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertStrictEquals } from "../../test_deps.ts";
 import { None } from "../option/mod.ts";
-import { I } from "./mod.ts";
+import { default as I } from "./mod.ts";
 
 Deno.test("from_fn", () => {
   const iter = I.fn(() => 1);

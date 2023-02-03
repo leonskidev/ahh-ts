@@ -8,64 +8,46 @@ it also helps to keep it working as intended.
 
 ## Demystification
 
-While it may look like it from that outside, `Option` and `Result` are nothing
-*special*, at least compared to how you would normally handle such cases. A
-quick look at the types for both of them shows how bland they really are:
+Unakin to how some other modules handle options and results, the ones provided
+here likely follow how you may deal with such cases yourself. A quick look at
+the types for both shows how simple they are:
 
 ```ts
-type None = undefined | null;
-type Some<T> = T;
-type Option<T> = None | Some<T>;
-
-// this is the most exciting it gets folks
-type Err<E extends Error> = E;
-type Ok<T> = T;
-type Result<T, E extends Error> = Err<E> | Ok<T>;
+type Option<T> = undefined | null | T;
+type Result<T, E extends Error> = E | T;
 ```
 
-When you compare that to how everything else handles optional values, there's no
-difference. The biggest departure is with how `Result` works, and that's due to
-TS having no concept of it to begin with; but even then it still sticks to using
-the built-in `Error` type.
+Almost all built-in and external modules handle options as above. The most
+aberrant departure is with how results work, which is due to JS/TS having no
+such concept, and instead opting to throw exceptions.
 
-So let's take a look at some `Option`s and `Result`s in actual code:
+With that in mind, let's see some working code with these types in use:
 
 ```ts
-import { Option, Result } from "./mod.ts";
+import type { Option, Result } from "./mod.ts";
 
-// `prompt` returns a `string` or `null`
 const input: Option<string> = prompt("URL:");
-
-// `new URL` returns a `URL` or throws an `Error`
-const url: Option<Result<URL, Error>> = input ? (() => {
-  try {
-    return new URL(input);
-  } catch (e) {
-    return e;
-  }
-})() : null;
+const url: Option<Result<URL, Error>> = input
+  ? (() => {
+    try {
+      return new URL(input);
+    } catch (e) {
+      return e;
+    }
+  })()
+  : null;
 ```
 
-As you can see, the most convoluted part is dealing with errors, which we need
-to explicitly catch. And that's all **Ahh** does, fill in those gaps to make
-this much easier:
+It starts well with the option pairing nicely with the prompt function's return
+type. However, the result requires we handle that the URL constructor may throw.
+
+All **Ahh** seeks to do is make such cases more straightforward to manage, as
+seen in the rewritten code:
 
 ```ts
-import { None, O, Option, R, Result } from "./mod.ts";
+import { None, O, R } from "./mod.ts";
 
-// no changes here; apart from removing the unnecessary typing
-const input = prompt("URL:");
-
-// so much easier
-const url = O.isSome(input) ? R.fn(() => new URL(input)) : None;
-
-// we can even go a step further
-const url2 = O.map(prompt("URL:"), (url) => R.fn(() => new URL(url)));
-
-// the "actual" types of these are just the bare types; no class weirdness
-input; // string
-url; // URL
-url2; // URL | null
+const url = O.map(prompt("URL:"), (input) => R.fn(() => new URL(input)));
 ```
 
 ## Licence

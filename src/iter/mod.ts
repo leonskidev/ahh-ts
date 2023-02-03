@@ -544,6 +544,7 @@ export class I {
     );
   }
 
+  // FIXME: this should test fine but fails for whatever reason
   // /**
   //  * Consumes an {@linkcode Iterator} until `f` returns `false`, and returns
   //  * `true` if it does not.

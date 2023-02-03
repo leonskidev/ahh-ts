@@ -10,7 +10,7 @@ export type Iterator<T> = {
    * Normally returns {@linkcode None} when iteration has finished, although
    * implementations may start returning {@linkcode Some} again at some point.
    */
-  next: () => Option<T>;
+  next(): Option<T>;
 } & Iterable<T>;
 
 /** An {@linkcode Iterator} that can peek the next item. */
@@ -19,7 +19,7 @@ export type Peekable<T> = {
    * Returns the {@linkcode Iterator.next} item without advancing the
    * {@linkcode Iterator}.
    */
-  peek: () => Option<T>;
+  peek(): Option<T>;
 } & Iterator<T>;
 
 /** Functionality for {@linkcode Iterator}. */
@@ -206,6 +206,26 @@ export class I {
       const next = iterA.next();
       return O.isSome(next) ? next : iterB.next();
     });
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that calls `f` on each item and yeilds the
+   * original item.
+   *
+   * @example
+   * ```ts
+   * import { I } from "./mod.ts";
+   *
+   * const iter = I.inspect(I.iter([1, 2, 3]), (i) => i * i);
+   *
+   * console.log(iter.next()); // 1
+   * console.log(iter.next()); // 2
+   * console.log(iter.next()); // 3
+   * console.log(iter.next()); // undefined
+   * ```
+   */
+  static inspect<T>(iter: Iterator<T>, f: (_: T) => unknown): Iterator<T> {
+    return I.fn(() => O.inspect(iter.next(), f));
   }
 
   /**
@@ -522,5 +542,61 @@ export class I {
       O.unwrapOr(iter.next(), I.empty()),
       (iterA, iterB) => I.chain(iterA, iterB),
     );
+  }
+
+  // /**
+  //  * Consumes an {@linkcode Iterator} until `f` returns `false`, and returns
+  //  * `true` if it does not.
+  //  *
+  //  * @example
+  //  * ```ts
+  //  * import { I } from "./mod.ts";
+  //  *
+  //  * const iter = I.iter([2, 4, 6]);
+  //  *
+  //  * console.log(I.all(iter, (i) => i > 0)); // true
+  //  * console.log(I.all(iter, (i) => i > 4)); // false
+  //  * ```
+  //  */
+  // static all<T>(iter: Iterator<T>, f: (_: T) => boolean): boolean {
+  //   return O.isNone(I.find(iter, (i) => !f(i)));
+  // }
+
+  /**
+   * Consumes an {@linkcode Iterator} until `f` returns `true`, and returns
+   * `true` if it does.
+   *
+   * @example
+   * ```ts
+   * import { I } from "./mod.ts";
+   *
+   * const iter = I.iter([2, 4, 6]);
+   *
+   * console.log(I.any(iter, (i) => i > 4)); // true
+   * console.log(I.any(iter, (i) => i > 6)); // false
+   * ```
+   */
+  static any<T>(iter: Iterator<T>, f: (_: T) => boolean): boolean {
+    return O.isSome(I.find(iter, f));
+  }
+
+  /**
+   * Consume the next value of an {@linkcode Iterator} and return it if `f`
+   * returns `true`.
+   *
+   * @example
+   * ```ts
+   * import { I } from "./mod.ts";
+   *
+   * const iter = I.peekable(I.iter([1, 2, 3]));
+   *
+   * console.log(I.nextIf(iter, (i) => i < 2)); // 1
+   * console.log(I.nextIf(iter, (i) => i < 2)); // undefined
+   * console.log(iter.next()); // 2
+   * ```
+   */
+  static nextIf<T>(iter: Peekable<T>, f: (_: T) => boolean): Option<T> {
+    const peek = iter.peek();
+    return O.isSome(peek) && f(peek) ? iter.next() : None;
   }
 }

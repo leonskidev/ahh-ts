@@ -1,4 +1,4 @@
-import { assertEquals, assertStrictEquals } from "../../test_deps.ts";
+import { assert, assertEquals, assertStrictEquals } from "../../test_deps.ts";
 import { None } from "../option/mod.ts";
 import { I } from "./mod.ts";
 
@@ -69,6 +69,16 @@ Deno.test("chain", () => {
   assertStrictEquals(iter.next(), 3);
   assertStrictEquals(iter.next(), 4);
   assertStrictEquals(iter.next(), 5);
+  assertStrictEquals(iter.next(), None);
+  assertStrictEquals(iter.next(), None);
+});
+
+Deno.test("inspect", () => {
+  const iter = I.inspect(I.iter([1, 2, 3]), (i) => i * i);
+
+  assertStrictEquals(iter.next(), 1);
+  assertStrictEquals(iter.next(), 2);
+  assertStrictEquals(iter.next(), 3);
   assertStrictEquals(iter.next(), None);
   assertStrictEquals(iter.next(), None);
 });
@@ -200,4 +210,36 @@ Deno.test("flatten", () => {
   assertStrictEquals(iter.next(), 3);
   assertStrictEquals(iter.next(), None);
   assertStrictEquals(iter.next(), None);
+});
+
+// Deno.test("all", async (t) => {
+//   const iter = I.iter([2, 4, 6]);
+
+//   await t.step("equals", () => assert(I.all(iter, (i) => i > 0)));
+//   await t.step("not_equals", () => assert(!I.all(iter, (i) => i > 4)));
+// });
+
+Deno.test("any", async (t) => {
+  const iter = I.iter([2, 4, 6]);
+
+  await t.step("equals", () => assert(I.any(iter, (i) => i > 4)));
+  await t.step("not_equals", () => assert(!I.any(iter, (i) => i > 6)));
+});
+
+Deno.test("next_if", async (t) => {
+  const iter = I.peekable(I.iter([1, 2]));
+
+  await t.step(
+    "equals",
+    () => assertStrictEquals(I.nextIf(iter, (i) => i < 2), 1),
+  );
+  await t.step(
+    "not_equals",
+    () => assertStrictEquals(I.nextIf(iter, (i) => i < 2), None),
+  );
+  await t.step("check_next", () => assertStrictEquals(iter.next(), 2));
+  await t.step(
+    "none",
+    () => assertStrictEquals(I.nextIf(iter, () => true), None),
+  );
 });

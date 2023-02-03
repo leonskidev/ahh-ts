@@ -21,7 +21,7 @@ type Ok<T> = T;
 type Result<T, E extends Error> = Err<E> | Ok<T>;
 ```
 
-When you compare that to how everything else handles optional values, there is no
+When you compare that to how everything else handles optional values, there's no
 difference. The biggest departure is with how `Result` works, and that's due to
 TS having no concept of it to begin with; but even then it still sticks to using
 the built-in `Error` type.
@@ -45,9 +45,9 @@ const url: Result<URL, Error> = () => {
 };
 ```
 
-As you can see, the most convoluted part is dealing with errors, which the rest
-of TS throws for us to catch. And that's all **Ahh** does, fill in those gaps to
-make this much easier:
+As you can see, the most convoluted part is dealing with errors, which we need
+to explicitly catch. And that's all **Ahh** does, fill in those gaps to make
+this much easier:
 
 ```ts
 import { Option, Result, O, R } from "./mod.ts";

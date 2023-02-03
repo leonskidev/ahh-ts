@@ -35,16 +35,15 @@ import { Option, Result } from "./mod.ts";
 
 // `prompt` returns a `string` or `null`
 const input: Option<string> = prompt("URL:");
-if (input === null) Deno.exit(1);
 
 // `new URL` returns a `URL` or throws an `Error`
-const url: Result<URL, Error> = (() => {
+const url: Option<Result<URL, Error>> = input ? (() => {
   try {
     return new URL(input);
   } catch (e) {
     return e;
   }
-})();
+})() : null;
 ```
 
 As you can see, the most convoluted part is dealing with errors, which we need
@@ -56,10 +55,9 @@ import { O, Option, R, Result } from "./mod.ts";
 
 // no changes here; apart from removing the unnecessary typing
 const input = prompt("URL:");
-if (input === null) Deno.exit(1);
 
 // so much easier
-const url = R.fn(() => new URL(input));
+const url = input ? R.fn(() => new URL(input)) : null;
 
 // we can even go a step further
 const url2 = O.map(prompt("URL:"), (url) => R.fn(() => new URL(url)));

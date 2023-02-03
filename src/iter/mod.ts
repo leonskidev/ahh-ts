@@ -114,8 +114,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that endlessly yields an item.
    *
-   * ## Example
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *

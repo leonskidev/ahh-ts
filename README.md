@@ -1,3 +1,5 @@
+<!-- deno-fmt-ignore-file -->
+
 # Ahh
 
 **Ahh** is a collection of idiomatic type-safety functions that are borrowed
@@ -36,13 +38,13 @@ const input: Option<string> = prompt("URL:");
 if (input === null) Deno.exit(1);
 
 // `new URL` returns a `URL` or throws an `Error`
-const url: Result<URL, Error> = () => {
+const url: Result<URL, Error> = (() => {
   try {
     return new URL(input);
-  } catch(e) {
+  } catch (e) {
     return e;
   }
-};
+})();
 ```
 
 As you can see, the most convoluted part is dealing with errors, which we need
@@ -50,7 +52,7 @@ to explicitly catch. And that's all **Ahh** does, fill in those gaps to make
 this much easier:
 
 ```ts
-import { Option, Result, O, R } from "./mod.ts";
+import { O, Option, R, Result } from "./mod.ts";
 
 // no changes here; apart from removing the unnecessary typing
 const input = prompt("URL:");

@@ -62,11 +62,10 @@ const url = R.fn(() => new URL(input));
 // we can even go a step further
 const url2 = O.map(prompt("URL:"), (url) => R.fn(() => new URL(url)));
 
-// the "actual" types of these are just the bare types;,
-// an `Option<string>` is a `string` or `null`, no class weirdness
-console.log(input); // <string>
-console.log(url); // <url>
-console.log(url2); // <url | null>
+// the "actual" types of these are just the bare types; no class weirdness
+input; // string
+url; // URL
+url2; // URL | null
 ```
 
 ## Licence

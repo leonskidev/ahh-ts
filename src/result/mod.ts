@@ -16,7 +16,7 @@ export type Result<T, E extends Error> = Err<E> | Ok<T>;
 /** Functionality for {@linkcode Result}. */
 export class R {
   /**
-   * Returns whether {@linkcode res} is an {@linkcode Ok}.
+   * Returns whether `res` is an {@linkcode Ok}.
    *
    * ## Examples
    *
@@ -32,7 +32,7 @@ export class R {
   }
 
   /**
-   * Returns whether {@linkcode res} is an {@linkcode Err}.
+   * Returns whether `res` is an {@linkcode Err}.
    *
    * ## Examples
    *
@@ -48,8 +48,8 @@ export class R {
   }
 
   /**
-   * Returns whether {@linkcode res} strictly equals {@linkcode value}, or
-   * `false` if it is an {@linkcode Err}.
+   * Returns whether `res` strictly equals `value`, or `false` if it is an
+   * {@linkcode Err}.
    *
    * ## Examples
    *
@@ -66,10 +66,10 @@ export class R {
   }
 
   /**
-   * Returns whether {@linkcode res} strictly equals {@linkcode value}, or
-   * `false` if it is an {@linkcode Ok}.
+   * Returns whether `res` strictly equals `value`, or `false` if it is an
+   * {@linkcode Ok}.
    *
-   * This only checks whether {@linkcode res} and {@linkcode value} have the
+   * This only checks whether `res` and `value` have the
    * same `name` and `message`.
    *
    * ## Examples
@@ -89,8 +89,7 @@ export class R {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode res}, and returns the original
-   * {@linkcode res}.
+   * Calls `f` with `res`, and returns the original `res`.
    *
    * ## Examples
    *
@@ -110,8 +109,7 @@ export class R {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode res}, and returns the original
-   * {@linkcode res}.
+   * Calls `f` with `res`, and returns the original `res`.
    *
    * ## Examples
    *
@@ -131,7 +129,7 @@ export class R {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode res}, and returns the result.
+   * Calls `f` with `res`, and returns the result.
    *
    * ## Examples
    *
@@ -150,7 +148,7 @@ export class R {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode res}, and returns the result.
+   * Calls `f` with `res`, and returns the result.
    *
    * ## Examples
    *
@@ -169,7 +167,7 @@ export class R {
   }
 
   /**
-   * Returns {@linkcode res} if it is an {@linkcode Ok}, or throws.
+   * Returns `res` if it is an {@linkcode Ok}, or throws.
    *
    * ## Examples
    *
@@ -188,8 +186,7 @@ export class R {
   }
 
   /**
-   * Returns {@linkcode res} if it is an {@linkcode Ok}, or returns
-   * {@linkcode default_}.
+   * Returns `res` if it is an {@linkcode Ok}, or returns `default_`.
    *
    * ## Examples
    *
@@ -205,7 +202,7 @@ export class R {
   }
 
   /**
-   * Return {@linkcode res} if it is an {@linkcode Ok}, or {@linkcode other}.
+   * Return `res` if it is an {@linkcode Ok}, or `other`.
    *
    * ## Examples
    *
@@ -226,8 +223,7 @@ export class R {
   }
 
   /**
-   * Return {@linkcode other} if {@linkcode res} is {@linkcode Ok}, or
-   * {@linkcode res}.
+   * Return `other` if `res` is {@linkcode Ok}, or `res`.
    *
    * ## Examples
    *
@@ -248,8 +244,7 @@ export class R {
   }
 
   /**
-   * Converts {@linkcode res} into a {@linkcode Some} if it is an
-   * {@linkcode Ok}.
+   * Converts `res` into a {@linkcode Some} if it is an {@linkcode Ok}.
    *
    * ## Examples
    *
@@ -265,8 +260,7 @@ export class R {
   }
 
   /**
-   * Converts {@linkcode res} into a {@linkcode Some} if it is an
-   * {@linkcode Err}.
+   * Converts `res` into a {@linkcode Some} if it is an {@linkcode Err}.
    *
    * ## Examples
    *
@@ -282,8 +276,8 @@ export class R {
   }
 
   /**
-   * Calls {@linkcode f} and returns the result as an {@linkcode Ok}, or returns
-   * an {@linkcode Err} if it throws.
+   * Calls `f` and returns the result as an {@linkcode Ok}, or returns an
+   * {@linkcode Err} if it throws.
    *
    * ## Examples
    *

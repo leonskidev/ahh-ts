@@ -15,7 +15,7 @@ export const None = undefined;
 /** Functionality for {@linkcode Option}. */
 export class O {
   /**
-   * Returns whether {@linkcode opt} is a {@linkcode Some}.
+   * Returns whether `opt` is a {@linkcode Some}.
    *
    * ## Examples
    *
@@ -31,7 +31,7 @@ export class O {
   }
 
   /**
-   * Returns whether {@linkcode opt} is a {@linkcode None}.
+   * Returns whether `opt` is a {@linkcode None}.
    *
    * ## Examples
    *
@@ -47,8 +47,8 @@ export class O {
   }
 
   /**
-   * Returns whether {@linkcode opt} strictly equals {@linkcode value}, or
-   * `false` if it is an {@linkcode None}.
+   * Returns whether `opt` strictly equals `value`, or `false` if it is a
+   * {@linkcode None}.
    *
    * ## Examples
    *
@@ -65,8 +65,7 @@ export class O {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode opt}, and returns the original
-   * {@linkcode opt}.
+   * Calls `f` with `opt`, and returns the original `opt`.
    *
    * ## Examples
    *
@@ -83,7 +82,7 @@ export class O {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode opt}, and returns the result.
+   * Calls `f` with `opt`, and returns the result.
    *
    * ## Examples
    *
@@ -99,8 +98,7 @@ export class O {
   }
 
   /**
-   * Calls {@linkcode f} with {@linkcode opt}, and returns it if the result is
-   * `true`.
+   * Calls `f` with `opt`, and returns it if the result is `true`.
    *
    * ## Examples
    *
@@ -117,7 +115,7 @@ export class O {
   }
 
   /**
-   * Returns {@linkcode opt} if it is a {@linkcode Some}, or throws.
+   * Returns `opt` if it is a {@linkcode Some}, or throws.
    *
    * ## Examples
    *
@@ -134,8 +132,7 @@ export class O {
   }
 
   /**
-   * Returns {@linkcode opt} if it is a {@linkcode Some}, or returns
-   * {@linkcode default_}.
+   * Returns `opt` if it is a {@linkcode Some}, or returns `default_`.
    *
    * ## Examples
    *
@@ -151,7 +148,7 @@ export class O {
   }
 
   /**
-   * Return {@linkcode opt} if it is a {@linkcode Some}, or {@linkcode other}.
+   * Return `opt` if it is a {@linkcode Some}, or `other`.
    *
    * ## Examples
    *
@@ -169,8 +166,7 @@ export class O {
   }
 
   /**
-   * Return {@linkcode other} if {@linkcode opt} is {@linkcode Some}, or
-   * {@linkcode None}.
+   * Return `other` if `opt` is {@linkcode Some}, or {@linkcode None}.
    *
    * ## Examples
    *
@@ -188,8 +184,7 @@ export class O {
   }
 
   /**
-   * Converts {@linkcode opt} into an {@linkcode Ok} if it is a
-   * {@linkcode Some}.
+   * Converts `opt` into an {@linkcode Ok} if it is a {@linkcode Some}.
    *
    * ## Examples
    *

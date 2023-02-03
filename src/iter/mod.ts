@@ -27,8 +27,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} where each iteration calls `f`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -59,8 +58,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} from an {@linkcode Iterable}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -82,8 +80,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that returns nothing.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -100,8 +97,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that returns exactly one item.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -138,8 +134,7 @@ export class I {
    * Creates an {@linkcode Iterator} where each successive item is computed from
    * the preceding one.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -171,8 +166,7 @@ export class I {
    * If either {@linkcode Iterator} returns {@linkcode None}, so will this
    * {@linkcode Iterator}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts"
    *
@@ -195,8 +189,7 @@ export class I {
    * Creates an {@linkcode Iterator} that will iterate over two other
    * {@linkcode Iterator}s sequentially.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -218,8 +211,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that calls `f` on each item.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -239,8 +231,7 @@ export class I {
    * Creates an {@linkcode Iterator} which returns the current iteration as well
    * as the next value.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -260,8 +251,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that skips the first `n` items.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -280,8 +270,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that skips items while `f` return `true`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -301,8 +290,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that returns the first `n` items.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -321,8 +309,7 @@ export class I {
    * Creates an {@linkcode Iterator} that returns items while `f` returns
    * `true`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -347,8 +334,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that is {@linkcode Peekable}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -385,8 +371,7 @@ export class I {
   /**
    * Consumes an {@linkcode Iterator} and runs `f` on each item.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -408,8 +393,7 @@ export class I {
    * Consumes an {@linkcode Iterator} and folds every item into an accumulator
    * using `f`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -428,8 +412,7 @@ export class I {
   /**
    * Consumes an {@linkcode Iterator} and returns the number of iterations.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -446,8 +429,7 @@ export class I {
   /**
    * Consumes an {@linkcode Iterator} and returns the last item.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -464,8 +446,7 @@ export class I {
   /**
    * Consumes an {@linkcode Iterator} up to `n` and returns the item.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -484,8 +465,7 @@ export class I {
    * Consumes an {@linkcode Iterator} until `f` returns `true` and returns the
    * item.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -505,8 +485,7 @@ export class I {
   /**
    * Creates an {@linkcode Iterator} that returns items when `f` returns `true`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *
@@ -525,8 +504,7 @@ export class I {
    * Creates an {@linkcode Iterator} that flattens a layer of nested
    * {@linkcode Iterator}s.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { I } from "./mod.ts";
    *

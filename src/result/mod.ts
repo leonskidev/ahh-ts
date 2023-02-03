@@ -18,8 +18,7 @@ export class R {
   /**
    * Returns whether `res` is an {@linkcode Ok}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -34,8 +33,7 @@ export class R {
   /**
    * Returns whether `res` is an {@linkcode Err}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -51,8 +49,7 @@ export class R {
    * Returns whether `res` strictly equals `value`, or `false` if it is an
    * {@linkcode Err}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -72,8 +69,7 @@ export class R {
    * This only checks whether `res` and `value` have the
    * same `name` and `message`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -91,8 +87,7 @@ export class R {
   /**
    * Calls `f` with `res`, and returns the original `res`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -111,8 +106,7 @@ export class R {
   /**
    * Calls `f` with `res`, and returns the original `res`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -131,8 +125,7 @@ export class R {
   /**
    * Calls `f` with `res`, and returns the result.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -150,8 +143,7 @@ export class R {
   /**
    * Calls `f` with `res`, and returns the result.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -169,8 +161,7 @@ export class R {
   /**
    * Returns `res` if it is an {@linkcode Ok}, or throws.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -188,8 +179,7 @@ export class R {
   /**
    * Returns `res` if it is an {@linkcode Ok}, or returns `default_`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -204,8 +194,7 @@ export class R {
   /**
    * Return `res` if it is an {@linkcode Ok}, or `other`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -225,8 +214,7 @@ export class R {
   /**
    * Return `other` if `res` is {@linkcode Ok}, or `res`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -246,8 +234,7 @@ export class R {
   /**
    * Converts `res` into a {@linkcode Some} if it is an {@linkcode Ok}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -262,8 +249,7 @@ export class R {
   /**
    * Converts `res` into a {@linkcode Some} if it is an {@linkcode Err}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *
@@ -279,8 +265,7 @@ export class R {
    * Calls `f` and returns the result as an {@linkcode Ok}, or returns an
    * {@linkcode Err} if it throws.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { R } from "./mod.ts";
    *

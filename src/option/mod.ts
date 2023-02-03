@@ -17,8 +17,7 @@ export class O {
   /**
    * Returns whether `opt` is a {@linkcode Some}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -33,8 +32,7 @@ export class O {
   /**
    * Returns whether `opt` is a {@linkcode None}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -50,8 +48,7 @@ export class O {
    * Returns whether `opt` strictly equals `value`, or `false` if it is a
    * {@linkcode None}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -67,8 +64,7 @@ export class O {
   /**
    * Calls `f` with `opt`, and returns the original `opt`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -84,8 +80,7 @@ export class O {
   /**
    * Calls `f` with `opt`, and returns the result.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -100,8 +95,7 @@ export class O {
   /**
    * Calls `f` with `opt`, and returns it if the result is `true`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -117,8 +111,7 @@ export class O {
   /**
    * Returns `opt` if it is a {@linkcode Some}, or throws.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -134,8 +127,7 @@ export class O {
   /**
    * Returns `opt` if it is a {@linkcode Some}, or returns `default_`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -150,8 +142,7 @@ export class O {
   /**
    * Return `opt` if it is a {@linkcode Some}, or `other`.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -168,8 +159,7 @@ export class O {
   /**
    * Return `other` if `opt` is {@linkcode Some}, or {@linkcode None}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *
@@ -186,8 +176,7 @@ export class O {
   /**
    * Converts `opt` into an {@linkcode Ok} if it is a {@linkcode Some}.
    *
-   * ## Examples
-   *
+   * @example
    * ```ts
    * import { O, None } from "./mod.ts";
    *

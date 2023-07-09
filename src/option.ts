@@ -80,7 +80,8 @@ export function isNone<T>(option: Option<T>): option is None {
 }
 
 /**
- * Returns {@linkcode option} with its value mapped via {@linkcode fn}.
+ * Returns {@linkcode option} with its value mapped via {@linkcode fn}, if it
+ * is a {@linkcode Some}.
  *
  * @example
  * ```ts
@@ -102,8 +103,8 @@ export function map<T, U>(
 }
 
 /**
- * Returns {@linkcode option} if {@linkcode fn} returns `true`, otherwise it
- * returns a {@linkcode None}.
+ * Returns {@linkcode option} if {@linkcode fn} returns `true` and it is a
+ * {@linkcode Some}.
  *
  * @example
  * ```ts

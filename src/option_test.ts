@@ -1,4 +1,4 @@
-import { assert, assertStrictEquals } from "../test_deps.ts";
+import { assert, assertFalse, assertStrictEquals } from "../test_deps.ts";
 import { default as O } from "./option.ts";
 
 Deno.test("is_some", async (t) => {
@@ -6,15 +6,15 @@ Deno.test("is_some", async (t) => {
   await t.step("1", () => assert(O.isSome(1)));
   await t.step("false", () => assert(O.isSome(false)));
   await t.step("true", () => assert(O.isSome(true)));
-  await t.step("undefined", () => assert(!O.isSome(undefined)));
-  await t.step("null", () => assert(!O.isSome(null)));
+  await t.step("undefined", () => assertFalse(O.isSome(undefined)));
+  await t.step("null", () => assertFalse(O.isSome(null)));
 });
 
 Deno.test("is_none", async (t) => {
-  await t.step("0", () => assert(!O.isNone(0)));
-  await t.step("1", () => assert(!O.isNone(1)));
-  await t.step("false", () => assert(!O.isNone(false)));
-  await t.step("true", () => assert(!O.isNone(true)));
+  await t.step("0", () => assertFalse(O.isNone(0)));
+  await t.step("1", () => assertFalse(O.isNone(1)));
+  await t.step("false", () => assertFalse(O.isNone(false)));
+  await t.step("true", () => assertFalse(O.isNone(true)));
   await t.step("undefined", () => assert(O.isNone(undefined)));
   await t.step("null", () => assert(O.isNone(null)));
 });

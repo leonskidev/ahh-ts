@@ -91,7 +91,7 @@ export function isNone<T>(option: Option<T>): option is None {
  *
  * if (O.isSome(double)) {
  *   console.log(num, "doubled is", double);
- * } else {}
+ * }
  * ```
  */
 export function map<T, U>(

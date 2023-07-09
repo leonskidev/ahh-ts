@@ -40,7 +40,7 @@
 export type None = undefined | null;
 /** A value this is neither `undefined` nor `null`. */
 export type Some<T> = T;
-/** A value that either {@linkcode Some} or {@linkcode None}. */
+/** A value that is either {@linkcode Some} or {@linkcode None}. */
 export type Option<T> = None | Some<T>;
 
 /**

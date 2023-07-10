@@ -12,7 +12,8 @@ and not require dependents of your library to also depend on this one.
 > above principles are still adhered to, but they have not yet been tested
 > thoroughly.
 
-Be sure to check out the **[documentation]** and the examples included with it.
+Be sure to check out the **[documentation]** and the examples included within
+it.
 
 ## Licence
 

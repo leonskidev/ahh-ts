@@ -9,29 +9,20 @@
  * type Option<T> = (undefined | null) | T;
  * ```
  *
- * Almost all built-in and external modules handle the *none* side as
- * `undefined` or `null`, and the *some* side as the value itself. This is
+ * Almost all built-in and external modules handle the ***none*** side as
+ * `undefined` or `null`, and the ***some*** side as the value itself. This is
  * exactly the same as what the type above defines.
  *
  * Since optionals are not special, we still have access to the features built
  * into the language, such as:
  *
- * - [Nullish coalescing] (`??` and `??=`)
- * - [Optional chaining] (`?.`)
+ * - [`??` and `??=`]()
+ * - [`?.`]
  *
  * This module simply provides extra functionality on-top of these.
  *
- * @example
- * ```ts
- * import { default as O } from "./option.ts";
- *
- * const url = O.map(prompt("URL:"), (url) => new URL(url));
- *
- * console.log(url ?? "no url was provided");
- * ```
- *
- * [Nullish coalescing]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing
- * [Optional chaining]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+ * [`??` and `??=`]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing
+ * [`?.`]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Optional_chaining
  *
  * @module
  */

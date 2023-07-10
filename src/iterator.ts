@@ -3,7 +3,7 @@
  *
  * Unlike the `Iterator` type built into JavaScript, this {@linkcode Iterator}
  * is lazy. This is useful as it means items are only evaluated once you call
- * {@linkcode Iterator.next next} on the {@linkcode Iterator}, not up-front.
+ * {@linkcode Iterator.next} on the {@linkcode Iterator}, not up-front.
  *
  * Since {@linkcode Iterator}s use the [iteration protocols], we still have
  * access to features built into the language, such as:
@@ -18,7 +18,7 @@
 
 import { default as O, Option } from "./option.ts";
 
-/** An interface type that can be iterated over. */
+/** An interface for types that can be iterated over. */
 export abstract class Iterator<T> implements Iterable<T> {
   /** Advances the iterator and returns the next item. */
   abstract next(): Option<T>;
@@ -334,7 +334,7 @@ export function fn<T>(fn: Iterator<T>["next"]): FromFn<T> {
 }
 
 /**
- * An {@linkcode Iterator} that yields items from an `Iterable`.
+ * Creates an {@linkcode Iterator} that yields items from an `Iterable`.
  *
  * @example
  * ```ts

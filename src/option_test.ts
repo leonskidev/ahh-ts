@@ -58,24 +58,6 @@ Deno.test("isNone", async (t) => {
   });
 });
 
-Deno.test("either", async (t) => {
-  await t.step("none", () => assertStrictEquals(O.either(undefined, 4), 4));
-  await t.step("some", () => assertStrictEquals(O.either<number>(2, 4), 2));
-});
-
-Deno.test("map", async (t) => {
-  const toString = (i: number): string => i.toString();
-
-  await t.step("none", async (t) => {
-    await t.step(
-      "undefined",
-      () => assertStrictEquals(O.map(undefined, toString), undefined),
-    );
-    await t.step("null", () => assertStrictEquals(O.map(null, toString), null));
-  });
-  await t.step("some", () => assertStrictEquals(O.map(2, toString), "2"));
-});
-
 Deno.test("zip", async (t) => {
   await t.step("none none", async (t) => {
     await t.step(

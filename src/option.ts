@@ -65,22 +65,6 @@ export function isNone<T>(option: Option<T>): option is None {
 }
 
 /**
- * Returns the value of `option` if it is a {@linkcode Some}, or returns `or`.
- *
- * @example
- * ```ts
- * import { assert } from "../test_deps.ts";
- * import O from "./option.ts";
- *
- * assert(O.either<number>(2, 4) === 4);
- * assert(O.either(undefined, 2) === 2);
- * ```
- */
-export function either<T>(option: Option<T>, or: T): T {
-  return isSome(option) ? option : or;
-}
-
-/**
  * Returns the result of `fn` appied to the value of `option`, if it is a
  * {@linkcode Some}.
  *
@@ -146,4 +130,4 @@ export function unzip<T extends Some<unknown>, U extends Some<unknown>>(
   return isSome(option) ? [option[0], option[1]] : [option, option];
 }
 
-export default { isSome, isNone, either, map, zip, unzip };
+export default { isSome, isNone, map, zip, unzip };

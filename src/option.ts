@@ -14,7 +14,7 @@
  * exactly the same as what the type above defines.
  *
  * Since optionals are not special, we still have access to the features built
- * into the language:
+ * into the language, such as:
  *
  * - [Nullish coalescing] (`??` and `??=`)
  * - [Optional chaining] (`?.`)

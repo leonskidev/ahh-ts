@@ -9,9 +9,11 @@
  * have access to features built into the language, such as:
  *
  * - [`for..of`] loops
+ * - \[[`...`]iter\]
  *
  * [iteration protocols]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Iteration_protocols
  * [`for..of`]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/for...of
+ * [`...`]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Spread_syntax
  *
  * @module
  */

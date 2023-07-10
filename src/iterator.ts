@@ -1,12 +1,12 @@
 /**
  * Contains an idiomatic {@linkcode Iterator} type and related functions.
  *
- * Unlike the `Iterator` type built into JavaScript, this {@linkcode Iterator}
- * is lazy. This is useful as it means items are only evaluated once you call
+ * Unlike the `Iterator` built into JavaScript, this {@linkcode Iterator} is
+ * lazy. This is useful since items are only evaluated once you call
  * {@linkcode Iterator.next} on the {@linkcode Iterator}, not up-front.
  *
- * Since {@linkcode Iterator}s use the [iteration protocols], we still have
- * access to features built into the language, such as:
+ * Since {@linkcode Iterator}s implement the [iteration protocols], we still
+ * have access to features built into the language, such as:
  *
  * - [`for..of`] loops
  *

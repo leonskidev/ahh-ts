@@ -16,7 +16,7 @@
  * Since optionals are not special, we still have access to the features built
  * into the language, such as:
  *
- * - [`??` and `??=`]()
+ * - [`??` and `??=`]
  * - [`?.`]
  *
  * This module simply provides extra functionality on-top of these.

@@ -3,13 +3,12 @@
  *
  * The {@linkcode Option} type defined here is nothing special, it's the same as
  * what the rest of the ecosystem already uses. Thanks to this, we still benefit
- * from the built-in language features for [nullish] and [falsy] types, such as:
+ * from the built-in language features for [nullish] types, such as:
  *
  * - [nullish coalescing] (`??` and `??=`); and
  * - [optional chaining] (`?.`).
  *
  * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
- * [falsy]: https://developer.mozilla.org/docs/Glossary/Falsy
  * [nullish coalescing]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing
  * [optional chaining]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Optional_chaining
  *

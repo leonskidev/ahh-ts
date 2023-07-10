@@ -22,12 +22,14 @@
  * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
  */
 export type None = undefined | null;
+
 /**
  * A value that is non-[nullish].
  *
  * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
  */
 export type Some<T> = NonNullable<T>;
+
 /** A value that is either {@linkcode None} or {@linkcode Some}. */
 export type Option<T> = None | Some<T>;
 

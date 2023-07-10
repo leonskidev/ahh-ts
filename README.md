@@ -2,11 +2,17 @@
 
 # Ahh
 
-**Ahh** is a collection of useful features borrowed from other languages and
-made to be **idiomatic** with the rest of the language. They're also split up
-into separate modules so that you can pick an choose what you need.
+**Ahh** is a collection of useful features borrowed from other languages that
+have **practical** use-cases in TypeScript. Each module provided by this library
+should be **intuitive** to use, **idiomatic** with the rest of the ecosystem,
+and not require dependents of your library to also depend on this one.
 
-Be sure to check-out the **[documentation]**, there is a lot of it.
+> **Warning**
+> Until v1 is released, this should be considered stable-*ish* as most. The
+> above principles are still adhered to, but they have not yet been tested
+> thoroughly.
+
+Be sure to check out the **[documentation]** and the examples included with it.
 
 ## Licence
 

@@ -5,7 +5,7 @@
  * what the rest of the ecosystem already uses. Thanks to this, we still benefit
  * from the built-in language features for [nullish] types, such as:
  *
- * - [nullish coalescing] (`??` and `??=`); and
+ * - [nullish coalescing] (`??` and `??=`); and,
  * - [optional chaining] (`?.`).
  *
  * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
@@ -14,23 +14,6 @@
  *
  * @module
  */
-
-/**
- * A value that is [nullish]; either `undefined` or `null`.
- *
- * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
- */
-export type None = undefined | null;
-
-/**
- * A value that is non-[nullish].
- *
- * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
- */
-export type Some<T> = NonNullable<T>;
-
-/** A value that is either {@linkcode None} or {@linkcode Some}. */
-export type Option<T> = None | Some<T>;
 
 /**
  * Returns whether `option` is a {@linkcode Some} value.
@@ -131,3 +114,20 @@ export function unzip<T extends Some<unknown>, U extends Some<unknown>>(
 }
 
 export default { isSome, isNone, map, zip, unzip };
+
+/**
+ * A value that is [nullish]; either `undefined` or `null`.
+ *
+ * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
+ */
+export type None = undefined | null;
+
+/**
+ * A value that is non-[nullish].
+ *
+ * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
+ */
+export type Some<T> = NonNullable<T>;
+
+/** A value that is either {@linkcode None} or {@linkcode Some}. */
+export type Option<T> = None | Some<T>;

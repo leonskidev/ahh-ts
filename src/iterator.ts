@@ -253,14 +253,14 @@ export abstract class Iterator<T extends Some<unknown>> implements Iterable<T> {
 
   /**
    * Creates an {@linkcode Iterator} that yields items from `this` and `other`
-   * interspersedly.
+   * interlacedly.
    *
    * @example
    * ```ts
    * import { assert } from "../test_deps.ts";
    * import I from "./iterator.ts";
    *
-   * const iter = I.fromIter([1, 3, 5]).intersperse(I.fromIter([2, 4]));
+   * const iter = I.fromIter([1, 3, 5]).interlace(I.fromIter([2, 4]));
    *
    * assert(iter.next() === 1);
    * assert(iter.next() === 2);
@@ -269,16 +269,16 @@ export abstract class Iterator<T extends Some<unknown>> implements Iterable<T> {
    * assert(iter.next() === 5);
    * ```
    */
-  intersperse(other: Iterator<T>): Iterator<T> {
+  interlace(other: Iterator<T>): Iterator<T> {
     const this_ = this.peekable();
-    let intersperse = false;
+    let interlace = false;
 
     return new FromFnIter(() => {
-      if (intersperse && O.isSome(this_.peek())) {
-        intersperse = false;
+      if (interlace && O.isSome(this_.peek())) {
+        interlace = false;
         return other.next();
       } else {
-        intersperse = true;
+        interlace = true;
         return this_.next();
       }
     });

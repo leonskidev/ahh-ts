@@ -168,17 +168,17 @@ Deno.test("zip", () => {
   assert(O.isNone(iterRhs.next()));
 });
 
-Deno.test("intersperse", () => {
+Deno.test("interlace", () => {
   const iterLhs = I.fromIter([1, 2, 3, 4]);
   const iterRhs = I.fromIter([-1, -1]);
-  const iterInterspersed = iterLhs.intersperse(iterRhs);
+  const iterInterlaced = iterLhs.interlace(iterRhs);
 
-  assertStrictEquals(iterInterspersed.next(), 1);
-  assertStrictEquals(iterInterspersed.next(), -1);
-  assertStrictEquals(iterInterspersed.next(), 2);
-  assertStrictEquals(iterInterspersed.next(), -1);
-  assertStrictEquals(iterInterspersed.next(), 3);
-  assert(O.isNone(iterInterspersed.next()));
+  assertStrictEquals(iterInterlaced.next(), 1);
+  assertStrictEquals(iterInterlaced.next(), -1);
+  assertStrictEquals(iterInterlaced.next(), 2);
+  assertStrictEquals(iterInterlaced.next(), -1);
+  assertStrictEquals(iterInterlaced.next(), 3);
+  assert(O.isNone(iterInterlaced.next()));
   assert(O.isNone(iterLhs.next()));
   assert(O.isNone(iterRhs.next()));
 });

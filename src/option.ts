@@ -76,14 +76,13 @@ export function map<T, U extends Some<unknown>>(
  *
  * @example
  * ```ts
- * import { assert } from "../test_deps.ts";
+ * import { assert, assertArrayIncludes } from "../test_deps.ts";
  * import O from "./option.ts";
  *
  * const zipped = O.zip(2, "hello");
  *
  * assert(O.isSome(zipped));
- * assert(zipped[0] === 2);
- * assert(zipped[1] === "hello");
+ * assertArrayIncludes(zipped, [2, "hello"]);
  * ```
  */
 export function zip<T, U>(
@@ -98,13 +97,12 @@ export function zip<T, U>(
  *
  * @example
  * ```ts
- * import { assert } from "../test_deps.ts";
+ * import { assertArrayIncludes } from "../test_deps.ts";
  * import O from "./option.ts";
  *
  * const unzipped = O.unzip([2, 4]);
  *
- * assert(unzipped[0] === 2);
- * assert(unzipped[1] === 4);
+ * assertArrayIncludes(unzipped, [2, 4]);
  * ```
  */
 export function unzip<T extends Some<unknown>, U extends Some<unknown>>(

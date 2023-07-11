@@ -8,7 +8,6 @@ should be **intuitive** to use, **idiomatic** with the rest of the ecosystem,
 and not require dependents of your library to also depend on this one.
 
 > **Warning**
->
 > Until v1 is released, this should be considered stable-*ish* as most. The
 > above principles are still adhered to, but they have not yet been tested
 > thoroughly.

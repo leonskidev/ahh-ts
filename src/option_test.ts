@@ -6,6 +6,8 @@ import {
 } from "../test_deps.ts";
 import O from "./option.ts";
 
+const toString = (i: number): string => i.toString();
+
 Deno.test("isSome", async (t) => {
   await t.step("truthy", async (t) => {
     await t.step("true", () => assert(O.isSome(true)));
@@ -56,6 +58,17 @@ Deno.test("isNone", async (t) => {
       await t.step("null", () => assert(O.isNone(null)));
     });
   });
+});
+
+Deno.test("map", async (t) => {
+  await t.step("none", async (t) => {
+    await t.step(
+      "undefined",
+      () => assert(O.isNone(O.map(undefined, toString))),
+    );
+    await t.step("null", () => assert(O.isNone(O.map(null, toString))));
+  });
+  await t.step("some", () => assertStrictEquals(O.map(2, toString), "2"));
 });
 
 Deno.test("zip", async (t) => {

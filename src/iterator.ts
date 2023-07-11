@@ -270,15 +270,16 @@ export abstract class Iterator<T extends Some<unknown>> implements Iterable<T> {
    * ```
    */
   intersperse(other: Iterator<T>): Iterator<T> {
+    const this_ = this.peekable();
     let intersperse = false;
 
     return new FromFnIter(() => {
-      if (intersperse) {
+      if (intersperse && O.isSome(this_.peek())) {
         intersperse = false;
         return other.next();
       } else {
         intersperse = true;
-        return this.next();
+        return this_.next();
       }
     });
   }

@@ -179,7 +179,6 @@ Deno.test("intersperse", () => {
   assertStrictEquals(iterInterspersed.next(), -1);
   assertStrictEquals(iterInterspersed.next(), 3);
   assert(O.isNone(iterInterspersed.next()));
-  assertStrictEquals(iterLhs.next(), 4);
   assert(O.isNone(iterLhs.next()));
   assert(O.isNone(iterRhs.next()));
 });

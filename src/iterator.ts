@@ -1,404 +1,76 @@
 /**
- * Contains an idiomatic {@linkcode Iterator} type and related functions.
+ * Composable iteration.
  *
- * Unlike the `Iterator` built into JavaScript, this {@linkcode Iterator} is
- * lazy. This is useful since items are only evaluated once you call
- * {@linkcode Iterator.next} on the {@linkcode Iterator}, not up-front.
+ * The {@linkcode Iterator} abstract class defined here builds on-top of
+ * [iteration protocols], which specifies how lazy iteration works. This also
+ * allows us to benefit from built-in language features, such as:
  *
- * Since {@linkcode Iterator}s implement the [iteration protocols], we still
- * have access to features built into the language, such as:
- *
- * - [`for..of`] loops
- * - [`...`] spread
+ * - [`for..of`] loops; and,
+ * - [spread syntax] (`...`).
  *
  * [iteration protocols]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Iteration_protocols
  * [`for..of`]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/for...of
- * [`...`]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+ * [spread syntax]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Spread_syntax
  *
  * @module
  */
 
+// NOTE: these are usef for documentation
+// deno-lint-ignore no-unused-vars
+import type { None } from "./option.ts";
 import { default as O, Option, Some } from "./option.ts";
 
-/** An interface for types that can be iterated over. */
-export abstract class Iterator<T extends Some<unknown>> implements Iterable<T> {
-  /** Advances the iterator and returns the next item. */
-  abstract next(): Option<T>;
-
-  /**
-   * Creates an {@linkcode Iterator} that yields each item mapped via
-   * {@linkcode fn}.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]).map((i) => i * 2);
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  map<U extends Some<unknown>>(fn: (_: T) => U): Map<T, U> {
-    return new Map(this, fn);
-  }
-
-  /**
-   * Consumes an {@linkcode Iterator} until {@linkcode fn} returns `true` and
-   * returns the item.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]);
-   *
-   * console.log(iter.find((i) => i % 2 !== 0));
-   * ```
-   */
-  find(fn: (_: T) => boolean): Option<T> {
-    let value = this.next();
-
-    while (O.isSome(value) && !fn(value)) {
-      value = this.next();
-    }
-
-    return value;
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that yields items for which {@linkcode fn}
-   * returns `true`.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]).filter((i) => i % 2 !== 0);
-   *
-   * console.log(iter.next());
-   */
-  filter(fn: (_: T) => boolean): Filter<T> {
-    return new Filter(this, fn);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} over two {@linkcode Iterator}s
-   * simultaneously.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]).zip(I.iter(["hello", "world"]));
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  zip<U extends Some<unknown>>(other: Iterator<U>): Zip<T, U> {
-    return new Zip(this, other);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} over two {@linkcode Iterator}s
-   * sequentially.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]).chain(I.iter([4, 5]));
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  chain(other: Iterator<T>): Chain<T> {
-    return new Chain(this, other);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that yields the iteration count as well as
-   * the next value.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter(["hello", "world"]).enumerate();
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  enumerate(): Enumerate<T> {
-    return new Enumerate(this);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that can be return the next item without
-   * consuming it.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter(["hello", "world"]).peekable();
-   *
-   * console.log(iter.peek());
-   * ```
-   */
-  peekable(): Peekable<T> {
-    return new Peekable(this);
-  }
-
-  /**
-   * Consumes an {@linkcode Iterator} and calls {@linkcode fn} on each item.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]);
-   *
-   * iter.forEach((value) => console.log(value));
-   * ```
-   */
-  forEach(fn: (_: T) => unknown): void {
-    let value = this.next();
-
-    while (O.isSome(value)) {
-      fn(value);
-      value = this.next();
-    }
-  }
-
-  /**
-   * Consumes an {@linkcode Iterator} and calls {@linkcode fn} on each item to
-   * collect them into {@linkcode init}.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]);
-   *
-   * const arr = iter.fold<number[]>([], (arr, i) => {
-   *   arr.push(i);
-   *   return arr;
-   * });
-   *
-   * console.log(arr);
-   * ```
-   */
-  fold<U>(init: U, fn: (init: U, _: T) => U): U {
-    this.forEach((value) => init = fn(init, value));
-    return init;
-  }
-
-  /**
-   * Consumes an {@linkcode Iterator} and returns the number of iterations.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]);
-   *
-   * console.log(iter.count());
-   * ```
-   */
-  count(): number {
-    return this.fold(0, (init, _) => ++init);
-  }
-
-  /**
-   * Consumes an {@linkcode Iterator} and returns the last item.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]);
-   *
-   * console.log(iter.last());
-   * ```
-   */
-  last(): Option<T> {
-    return this.fold<Option<T>>(undefined, (_, item) => item);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that skips the first {@linkcode n} items.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]).skip(2);
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  skip(n: number): Skip<T> {
-    return new Skip(this, n);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that takes the first {@linkcode n} items.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]).take(2);
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  take(n: number): Take<T> {
-    return new Take(this, n);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that skips items while {@linkcode fn}
-   * returns `true`.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 3, 2]).skipWhile((i) => i % 2 !== 0);
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  skipWhile(fn: (_: T) => boolean): SkipWhile<T> {
-    return new SkipWhile(this, fn);
-  }
-
-  /**
-   * Creates an {@linkcode Iterator} that takes items while {@linkcode fn}
-   * returns `true`.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 3, 2]).takeWhile((i) => i % 2 !== 0);
-   *
-   * console.log(iter.next());
-   * ```
-   */
-  takeWhile(fn: (_: T) => boolean): TakeWhile<T> {
-    return new TakeWhile(this, fn);
-  }
-
-  /**
-   * Consumes {@linkcode n} items from the {@linkcode Iterator} and returns the
-   * next item.
-   *
-   * @example
-   * ```ts
-   * import { default as I } from "./iterator.ts";
-   *
-   * const iter = I.iter([1, 2, 3]);
-   *
-   * console.log(iter.nth(1));
-   * ```
-   */
-  nth(n: number): Option<T> {
-    return this.skip(n).next();
-  }
-
-  [Symbol.iterator](): globalThis.Iterator<T> {
-    return {
-      next: () => {
-        const value = this.next();
-        return { done: O.isNone(value) as true, value };
-      },
-    };
-  }
-}
-
 /**
- * Creates an {@linkcode Iterator} that calls {@linkcode fn} each iteration.
+ * Creates an {@linkcode Iterator} that yields the result of `fn` each
+ * iteration.
  *
  * @example
  * ```ts
- * import { default as I } from "./iterator.ts";
+ * import { assert } from "../test_deps.ts";
+ * import I from "./iterator.ts";
  *
  * let i = 0;
- * const iter = I.fn(() => ++i);
+ * const iter = I.fromFn(() => i++);
  *
- * console.log(iter.next());
+ * assert(iter.next() === 0);
+ * assert(iter.next() === 1);
+ * assert(iter.next() === 2);
  * ```
  */
-export function fn<T extends Some<unknown>>(
-  fn: Iterator<T>["next"],
-): FromFn<T> {
-  return new FromFn(fn);
+export function fromFn<T extends Some<unknown>>(
+  fn: () => Option<T>,
+): Iterator<T> {
+  return new FromFnIter(fn);
 }
 
 /**
- * Creates an {@linkcode Iterator} that yields items from an `Iterable`.
+ * Creates an {@linkcode Iterator} that yields the next item from an `iter` that
+ * conforms to the [iteration protocols].
+ *
+ * [iteration protocols]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Iteration_protocols
  *
  * @example
  * ```ts
- * import { default as I } from "./iterator.ts";
+ * import { assert } from "../test_deps.ts";
+ * import I from "./iterator.ts";
  *
- * const iter = I.iter([1, false]);
+ * let i = 0;
+ * const iter = I.fromIter([1, 2]);
  *
- * console.log(iter.next());
+ * assert(iter.next() === 1);
+ * assert(iter.next() === 2);
+ * assert(iter.next() === undefined);
  * ```
  */
-export function iter<T extends Some<unknown>>(iter: Iterable<T>): FromIter<T> {
-  return new FromIter(iter);
-}
+export function fromIter<T extends Some<unknown>>(
+  iter: Iterable<T>,
+): Iterator<T> {
+  const iter_ = iter[Symbol.iterator]();
 
-/**
- * Creates an {@linkcode Iterator} that yields nothing.
- *
- * @example
- * ```ts
- * import { default as I } from "./iterator.ts";
- *
- * const iter = I.empty();
- *
- * console.log(iter.next());
- * ```
- */
-export function empty<T extends Some<unknown>>(): Empty<T> {
-  return new Empty();
-}
-
-/**
- * Creates an {@linkcode Iterator} that yields exactly one item.
- *
- * @example
- * ```ts
- * import { default as I } from "./iterator.ts";
- *
- * const iter = I.once("hello");
- *
- * console.log(iter.next());
- * ```
- */
-export function once<T extends Some<unknown>>(item: T): Once<T> {
-  return new Once(item);
-}
-
-/**
- * Creates an {@linkcode Iterator} that endlessly yields an item.
- *
- * @example
- * ```ts
- * import { default as I } from "./iterator.ts";
- *
- * const iter = I.repeat("hello");
- *
- * console.log(iter.next());
- * ```
- */
-export function repeat<T extends Some<unknown>>(item: T): Repeat<T> {
-  return new Repeat(item);
+  return new FromFnIter(() => {
+    const { done, value } = iter_.next();
+    return done ? undefined : value;
+  });
 }
 
 /**
@@ -407,201 +79,431 @@ export function repeat<T extends Some<unknown>>(item: T): Repeat<T> {
  *
  * @example
  * ```ts
- * import { default as I } from "./iterator.ts";
+ * import { assert } from "../test_deps.ts";
+ * import I from "./iterator.ts";
  *
- * const iter = I.repeat("hello");
+ * const iter = I.successors<number>(0, (i) => i + 1);
  *
- * console.log(iter.next());
+ * assert(iter.next() === 0);
+ * assert(iter.next() === 1);
+ * assert(iter.next() === 2);
  * ```
  */
 export function successors<T extends Some<unknown>>(
   init: Option<T>,
-  fn: (_: T) => Option<T>,
-): Successors<T> {
-  return new Successors(init, fn);
+  fn: (item: T) => Option<T>,
+) {
+  return new FromFnIter(() =>
+    O.map(init, (item: T): Option<T> => {
+      init = fn(item);
+      return item;
+    })
+  );
 }
 
-/** See {@linkcode fn}. */
-export class FromFn<T extends Some<unknown>> extends Iterator<T> {
-  #next: Iterator<T>["next"];
-
-  constructor(fn: Iterator<T>["next"]) {
-    super();
-    this.#next = fn;
-  }
-
-  next(): Option<T> {
-    return this.#next();
-  }
+/**
+ * Creates an {@linkcode Iterator} that yields nothing.
+ *
+ * @example
+ * ```ts
+ * import { assert } from "../test_deps.ts";
+ * import I from "./iterator.ts";
+ *
+ * const iter = I.empty();
+ *
+ * assert(iter.next() === undefined);
+ * ```
+ */
+export function empty<T extends Some<unknown>>(): Iterator<T> {
+  return new FromFnIter<T>(() => undefined);
 }
 
-/** See {@linkcode iter}. */
-export class FromIter<T extends Some<unknown>> extends Iterator<T> {
-  #iter: globalThis.Iterator<T>;
-
-  constructor(iter: Iterable<T>) {
-    super();
-    this.#iter = iter[Symbol.iterator]();
-  }
-
-  next(): Option<T> {
-    const value = this.#iter.next();
-    return value.done ? undefined : value.value;
-  }
+/**
+ * Creates an {@linkcode Iterator} that endlessly yields `item`.
+ *
+ * @example
+ * ```ts
+ * import { assert } from "../test_deps.ts";
+ * import I from "./iterator.ts";
+ *
+ * const iter = I.repeat(() => 2);
+ *
+ * assert(iter.next() === 2);
+ * assert(iter.next() === 2);
+ * assert(iter.next() === 2);
+ * ```
+ */
+export function repeat<T extends Some<unknown>>(item: () => T): Iterator<T> {
+  return new FromFnIter(item);
 }
 
-/** See {@linkcode empty}. */
-export class Empty<T extends Some<unknown>> extends Iterator<T> {
-  next(): Option<T> {
+/**
+ * Creates an {@linkcode Iterator} that yields exactly one `item`.
+ *
+ * @example
+ * ```ts
+ * import { assert } from "../test_deps.ts";
+ * import I from "./iterator.ts";
+ *
+ * const iter = I.once(2);
+ *
+ * assert(iter.next() === 2);
+ * assert(iter.next() === undefined);
+ * ```
+ */
+export function once<T extends Some<unknown>>(item: T): Iterator<T> {
+  return successors<T>(item, () => undefined);
+}
+
+export default { fromFn, fromIter, successors, empty, repeat, once };
+
+/** Implemented by classes that can be iterated. */
+export abstract class Iterator<T extends Some<unknown>> implements Iterable<T> {
+  /** Advances the {@linkcode Iterator} and yields the next item. */
+  abstract next(): Option<T>;
+
+  [Symbol.iterator](): globalThis.Iterator<T> {
+    return {
+      next: () => {
+        const item = this.next();
+        return { done: O.isNone(item) as true, value: item };
+      },
+    };
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that calls `fn` one each item of `this`.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const toString = (i: number): string => i.toString();
+   * const iter = I.fromIter([1, 2, 3]).map(toString);
+   *
+   * assert(iter.next() === "1");
+   * assert(iter.next() === "2");
+   * assert(iter.next() === "3");
+   * ```
+   */
+  map<U extends Some<unknown>>(fn: (item: T) => U): Iterator<U> {
+    return new FromFnIter(() => O.map(this.next(), fn));
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that yields items for which `fn` returns
+   * `true`.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const odd = (i: number): boolean => i % 2 !== 0;
+   * const iter = I.fromIter([1, 2, 3]).filter(odd);
+   *
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 3);
+   * ```
+   */
+  filter(fn: (item: T) => boolean): Iterator<T> {
+    return new FromFnIter(() => this.find(fn));
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that yields items from `this` and `other`
+   * sequentially.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1]).chain(I.fromIter([2, 3]));
+   *
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 2);
+   * assert(iter.next() === 3);
+   * ```
+   */
+  chain(other: Iterator<T>): Iterator<T> {
+    return new FromFnIter(() => this.next() ?? other.next());
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that yields items from `this` and `other`
+   * simultaneously.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1]).chain(I.fromIter([2, 3]));
+   *
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 2);
+   * assert(iter.next() === 3);
+   * ```
+   */
+  zip<U extends Some<unknown>>(other: Iterator<U>): Iterator<[T, U]> {
+    return new FromFnIter(() => O.zip(this.next(), other.next()));
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that yields items from `this` and `other`
+   * interspersedly.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 3, 5]).intersperse(I.fromIter([2, 4]));
+   *
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 2);
+   * assert(iter.next() === 3);
+   * assert(iter.next() === 4);
+   * assert(iter.next() === 5);
+   * ```
+   */
+  intersperse(other: Iterator<T>): Iterator<T> {
+    let intersperse = false;
+
+    return new FromFnIter(() => {
+      if (intersperse) {
+        intersperse = false;
+        return other.next();
+      } else {
+        intersperse = true;
+        return this.next();
+      }
+    });
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that yields the iteration count and next
+   * item.
+   *
+   * @example
+   * ```ts
+   * import { assert, assertArrayIncludes } from "../test_deps.ts";
+   * import O from "./option.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter(["hello", "world"]).enumerate();
+   *
+   * let item = iter.next();
+   * assert(O.isSome(item));
+   * assertArrayIncludes(item, [0, "hello"]);
+   *
+   * item = iter.next();
+   * assert(O.isSome(item));
+   * assertArrayIncludes(item, [1, "world"]);
+   * ```
+   */
+  enumerate(): Iterator<[number, T]> {
+    return successors<number>(0, (i) => i + 1).zip(this);
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that can return the next item without
+   * consuming it.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 2, 3]).peekable();
+   *
+   * assert(iter.peek() === 1);
+   * assert(iter.peek() === 1);
+   * assert(iter.next() === 1);
+   * ```
+   */
+  peekable(): Peekable<T> {
+    return new Peekable(this);
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that exclusively returns {@linkcode None}
+   * after the first {@linkcode None}.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import O from "./option.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 2]).fuse();
+   *
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 2);
+   * assert(O.isNone(iter.next()));
+   * ```
+   */
+  fuse(): Fuse<T> {
+    return new Fuse(this);
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that skips the first `n` items.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 2, 3]).skip(2);
+   *
+   * assert(iter.next() === 3);
+   * ```
+   */
+  skip(n: number): Iterator<T> {
+    return new FromFnIter(() => {
+      while (n-- > 0 && O.isSome(this.next()));
+      return this.next();
+    });
+  }
+
+  /**
+   * Creates an {@linkcode Iterator} that takes the first `n` items.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 2, 3]).take(2);
+   *
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 2);
+   * ```
+   */
+  take(n: number): Iterator<T> {
+    return new FromFnIter(() => n-- > 0 ? this.next() : undefined);
+  }
+
+  /**
+   * Consumes `this` until `fn` returns `true`, and returns the item.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const odd = (i: number): boolean => i % 2 !== 0;
+   * const iter = I.fromIter([1, 2, 3]);
+   *
+   * assert(iter.find(odd) === 1);
+   * assert(iter.find(odd) === 3);
+   * ```
+   */
+  find(fn: (item: T) => boolean): Option<T> {
+    for (const item of this) {
+      if (fn(item)) {
+        return item;
+      }
+    }
     return undefined;
   }
-}
 
-/** See {@linkcode once}. */
-export class Once<T extends Some<unknown>> extends Iterator<T> {
-  #item: Option<T>;
-
-  constructor(item: T) {
-    super();
-    this.#item = item;
-  }
-
-  next(): Option<T> {
-    if (O.isSome(this.#item)) {
-      const item = this.#item;
-      this.#item = undefined;
-      return item;
-    } else {
-      return undefined;
+  /**
+   * Consumes `this` and calls `fn` on each item to collect them into `init`.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const sum = (a: number, b: number): number => a + b;
+   * const iter = I.fromIter([1, 2, 3]);
+   *
+   * assert(iter.fold(0, sum) === 6);
+   * ```
+   */
+  fold<U>(init: U, fn: (init: U, item: T) => U): U {
+    for (const item of this) {
+      init = fn(init, item);
     }
+    return init;
+  }
+
+  /**
+   * Consumes `this` until it is empty and returns the last item.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 2, 3]);
+   *
+   * assert(iter.last() === 3);
+   * ```
+   */
+  last(): Option<T> {
+    return this.fold<Option<T>>(undefined, (_, item) => item);
+  }
+
+  /**
+   * Consumes `n` items from `this` and returns the next item.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const iter = I.fromIter([1, 2, 3]);
+   *
+   * assert(iter.nth(1) === 2);
+   * ```
+   */
+  nth(n: number): Option<T> {
+    return this.skip(n).next();
+  }
+
+  /**
+   * Consumes `this` and returns whether `fn` returns `true` for all items.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const odd = (i: number): boolean => i % 2 !== 0;
+   * const iter = I.fromIter([1, 3, 5]);
+   *
+   * assert(iter.all(odd));
+   * ```
+   */
+  all(fn: (item: T) => boolean): boolean {
+    return O.isNone(this.find((item) => !fn(item)));
+  }
+
+  /**
+   * Consumes `this` until `fn` returns `true` for an item.
+   *
+   * @example
+   * ```ts
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
+   *
+   * const odd = (i: number): boolean => i % 2 !== 0;
+   * const iter = I.fromIter([2, 3, 4]);
+   *
+   * assert(iter.any(odd));
+   * ```
+   */
+  any(fn: (item: T) => boolean): boolean {
+    return O.isSome(this.find(fn));
   }
 }
 
-/** See {@linkcode repeat}. */
-export class Repeat<T extends Some<unknown>> extends Iterator<T> {
-  #item: T;
-
-  constructor(item: T) {
-    super();
-    this.#item = item;
-  }
-
-  next(): Option<T> {
-    return this.#item;
-  }
-}
-
-/** See {@linkcode successors}. */
-export class Successors<T extends Some<unknown>> extends Iterator<T> {
-  #item: Option<T>;
-  #fn: (_: T) => Option<T>;
-
-  constructor(item: Option<T>, fn: (_: T) => Option<T>) {
-    super();
-    this.#item = item;
-    this.#fn = fn;
-  }
-
-  next(): Option<T> {
-    const value = this.#item;
-
-    if (O.isSome(value)) {
-      this.#item = this.#fn(value);
-    }
-
-    return value;
-  }
-}
-
-/** See {@linkcode Iterator.map}. */
-export class Map<T extends Some<unknown>, U extends Some<unknown>>
-  extends Iterator<U> {
-  #iter: Iterator<T>;
-  #fn: (_: T) => U;
-
-  constructor(iter: Iterator<T>, fn: (_: T) => U) {
-    super();
-    this.#iter = iter;
-    this.#fn = fn;
-  }
-
-  next(): Option<U> {
-    return O.map(this.#iter.next(), this.#fn);
-  }
-}
-
-/** See {@linkcode Iterator.filter}. */
-export class Filter<T extends Some<unknown>> extends Iterator<T> {
-  #iter: Iterator<T>;
-  #fn: (_: T) => boolean;
-
-  constructor(iter: Iterator<T>, fn: (_: T) => boolean) {
-    super();
-    this.#iter = iter;
-    this.#fn = fn;
-  }
-
-  next(): Option<T> {
-    return this.#iter.find(this.#fn);
-  }
-}
-
-/** See {@linkcode Iterator.zip}. */
-export class Zip<T extends Some<unknown>, U extends Some<unknown>>
-  extends Iterator<[T, U]> {
-  #lhs: Iterator<T>;
-  #rhs: Iterator<U>;
-
-  constructor(lhs: Iterator<T>, rhs: Iterator<U>) {
-    super();
-    this.#lhs = lhs;
-    this.#rhs = rhs;
-  }
-
-  next(): Option<[T, U]> {
-    const lhs = this.#lhs.next();
-    const rhs = this.#rhs.next();
-
-    if (O.isSome(lhs) && O.isSome(rhs)) {
-      return [lhs, rhs];
-    } else {
-      return undefined;
-    }
-  }
-}
-
-/** See {@linkcode Iterator.chain}. */
-export class Chain<T extends Some<unknown>> extends Iterator<T> {
-  #lhs: Iterator<T>;
-  #rhs: Iterator<T>;
-
-  constructor(lhs: Iterator<T>, rhs: Iterator<T>) {
-    super();
-    this.#lhs = lhs;
-    this.#rhs = rhs;
-  }
-
-  next(): Option<T> {
-    return this.#lhs.next() ?? this.#rhs.next();
-  }
-}
-
-/** See {@linkcode Iterator.enumerate}. */
-export class Enumerate<T extends Some<unknown>> extends Iterator<[number, T]> {
-  #iter: Iterator<T>;
-  #count = 0;
-
-  constructor(iter: Iterator<T>) {
-    super();
-    this.#iter = iter;
-  }
-
-  next(): Option<[number, T]> {
-    return O.map(this.#iter.next(), (value) => [this.#count++, value]);
-  }
-}
-
-/** See {@linkcode Iterator.peekable}. */
+/** Implemented by {@linkcode Iterator}s that can be peeked. */
 export class Peekable<T extends Some<unknown>> extends Iterator<T> {
   #iter: Iterator<T>;
   #peeked: Option<T> = undefined;
@@ -613,9 +515,9 @@ export class Peekable<T extends Some<unknown>> extends Iterator<T> {
 
   next(): Option<T> {
     if (O.isSome(this.#peeked)) {
-      const value = this.#peeked;
+      const item = this.#peeked;
       this.#peeked = undefined;
-      return value;
+      return item;
     } else {
       return this.#iter.next();
     }
@@ -626,11 +528,17 @@ export class Peekable<T extends Some<unknown>> extends Iterator<T> {
    *
    * @example
    * ```ts
-   * import { default as I } from "./iterator.ts";
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
    *
-   * const iter = I.iter(["hello", "world"]).peekable();
+   * const iter = I.fromIter([1, 2, 3]).peekable();
    *
-   * console.log(iter.peek());
+   * assert(iter.peek() === 1);
+   * assert(iter.next() === 1);
+   * assert(iter.next() === 2);
+   * assert(iter.peek() === 3);
+   * assert(iter.peek() === 3);
+   * assert(iter.next() === 3);
    * ```
    */
   peek(): Option<T> {
@@ -641,101 +549,62 @@ export class Peekable<T extends Some<unknown>> extends Iterator<T> {
   }
 
   /**
-   * Returns the next item if {@linkcode fn} returns `true`.
+   * Returns the next item if `fn` returns `true`.
    *
    * @example
    * ```ts
-   * import { default as I } from "./iterator.ts";
+   * import { assert } from "../test_deps.ts";
+   * import I from "./iterator.ts";
    *
-   * const iter = I.iter([1, 2, 3]).peekable();
+   * const odd = (i: number): boolean => i % 2 !== 0;
+   * const iter = I.fromIter([1, 2, 3]).peekable();
    *
-   * console.log(iter.nextIf((i) => i % 2 !== 0));
+   * assert(iter.nextIf(odd) === 1);
+   * assert(iter.nextIf(odd) === undefined);
    * ```
    */
-  nextIf(fn: (_: T) => boolean): Option<T> {
-    const value = this.peek();
-    return O.isSome(value) && fn(value) ? this.next() : undefined;
+  nextIf(fn: (item: T) => boolean): Option<T> {
+    const item = this.peek();
+    return O.isSome(item) && fn(item) ? this.next() : undefined;
   }
 }
 
-/** See {@linkcode Iterator.skip}. */
-export class Skip<T extends Some<unknown>> extends Iterator<T> {
-  #iter: Iterator<T>;
-
-  constructor(iter: Iterator<T>, n: number) {
-    super();
-
-    while (n-- > 0 && O.isSome(iter.next()));
-    this.#iter = iter;
-  }
-
-  next(): Option<T> {
-    return this.#iter.next();
-  }
-}
-
-/** See {@linkcode Iterator.take}. */
-export class Take<T extends Some<unknown>> extends Iterator<T> {
-  #iter: Iterator<T>;
-  #n: number;
-
-  constructor(iter: Iterator<T>, n: number) {
-    super();
-    this.#iter = iter;
-    this.#n = n;
-  }
-
-  next(): Option<T> {
-    if (this.#n-- > 0) {
-      return this.#iter.next();
-    } else {
-      return undefined;
-    }
-  }
-}
-
-/** See {@linkcode Iterator.skipWhile}. */
-export class SkipWhile<T extends Some<unknown>> extends Iterator<T> {
-  #iter: Iterator<T>;
-
-  constructor(iter: Iterator<T>, fn: (_: T) => boolean) {
-    super();
-
-    const iter_ = iter.peekable();
-    while (O.isSome(iter_.nextIf(fn)));
-
-    this.#iter = iter_;
-  }
-
-  next(): Option<T> {
-    return this.#iter.next();
-  }
-}
-
-/** See {@linkcode Iterator.takeWhile}. */
-export class TakeWhile<T extends Some<unknown>> extends Iterator<T> {
+/**
+ * Implemented by {@linkcode Iterator}s that exclusively returns
+ * {@linkcode None} after encountering the first {@linkcode None}.
+ */
+export class Fuse<T extends Some<unknown>> extends Iterator<T> {
   #iter: Option<Iterator<T>>;
-  #fn: (_: T) => boolean;
 
-  constructor(iter: Iterator<T>, fn: (_: T) => boolean) {
+  constructor(iter: Iterator<T>) {
     super();
     this.#iter = iter;
-    this.#fn = fn;
   }
 
   next(): Option<T> {
     if (O.isSome(this.#iter)) {
-      const value = this.#iter.next();
+      const item = this.#iter.next();
 
-      if (O.isSome(value) && this.#fn(value)) {
-        return value;
-      } else {
-        return undefined;
+      if (O.isNone(item)) {
+        this.#iter = undefined;
       }
+
+      return item;
     } else {
       return undefined;
     }
   }
 }
 
-export default { fn, iter, empty, once, repeat, successors };
+class FromFnIter<T extends Some<unknown>> extends Iterator<T> {
+  #fn: () => Option<T>;
+
+  constructor(fn: () => Option<T>) {
+    super();
+    this.#fn = fn;
+  }
+
+  next(): Option<T> {
+    return this.#fn();
+  }
+}

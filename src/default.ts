@@ -36,6 +36,7 @@
  * ```
  */
 export function def<T>(object: Default<T>): T;
+
 /**
  * Returns the default value for the `undefined` primitive.
  *
@@ -48,6 +49,7 @@ export function def<T>(object: Default<T>): T;
  * ```
  */
 export function def(primitive: "undefined"): undefined;
+
 /**
  * Returns the default value for the `null` object.
  *
@@ -60,6 +62,7 @@ export function def(primitive: "undefined"): undefined;
  * ```
  */
 export function def(object: "null"): null;
+
 /**
  * Returns the default value for the `boolean` primitive.
  *
@@ -72,6 +75,7 @@ export function def(object: "null"): null;
  * ```
  */
 export function def(primitive: "boolean"): false;
+
 /**
  * Returns the default value for the `number` primitive.
  *
@@ -84,6 +88,7 @@ export function def(primitive: "boolean"): false;
  * ```
  */
 export function def(primitive: "number"): 0;
+
 /**
  * Returns the default value for the `bigint` primitive.
  *
@@ -96,6 +101,7 @@ export function def(primitive: "number"): 0;
  * ```
  */
 export function def(primitive: "bigint"): 0n;
+
 /**
  * Returns the default value for the `string` primitive.
  *
@@ -108,6 +114,7 @@ export function def(primitive: "bigint"): 0n;
  * ```
  */
 export function def(primitive: "string"): "";
+
 export function def<T>(
   object:
     | Default<T>

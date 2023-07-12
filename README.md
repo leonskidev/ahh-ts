@@ -3,23 +3,21 @@
 # Ahh
 
 **Ahh** is a collection of useful features borrowed from other languages that
-have **practical** use-cases in TypeScript. Each module provided by this library
-should be **intuitive** to use, **idiomatic** with the rest of the ecosystem,
-and not require dependents of your library to also depend on this one.
+have **practical** use-cases in TypeScript. Be sure to check out the
+[documentation] and the examples included within it.
 
-> **Warning**
-> Until v1 is released, this should be considered stable-*ish* at most. The
-> above principles are still adhered to, but they have not yet been tested
-> thoroughly.
+## Ethos
 
-Be sure to check out the **[documentation]** and the examples included within
-it.
+**Ahh** has a very simple ethos: be **intuitive** to use, **idiomatic** to
+write, and **non-viral** to dependents. Any items you use from these modules
+are just as usable if you expose them to dependents; they don't have to depend
+on this library as well.
 
 ## Licence
 
 All code in the repository is dual-licence under either [MIT] or [Apache 2.0]
-licences, at your option. Contributions submitted by you shall be dual-licensed
-as above without any additional terms or conditions.
+licences, at your option. Contributions intentionally submitted by you shall be
+dual-licensed, as above, without any additional terms or conditions.
 
 [documentation]: https://deno.land/x/ahh/src
 [MIT]: ./LICENCE-MIT

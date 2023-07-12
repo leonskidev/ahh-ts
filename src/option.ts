@@ -1,5 +1,5 @@
 /**
- * An optional value.
+ * Optionals.
  *
  * The {@linkcode Option} type defined here is nothing special, it's the same as
  * what the rest of the ecosystem already uses. Thanks to this, we still benefit

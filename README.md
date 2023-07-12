@@ -8,10 +8,9 @@ have **practical** use-cases in TypeScript. Be sure to check out the
 
 ## Ethos
 
-**Ahh** has a very simple ethos: be **intuitive** to use, **idiomatic** to
-write, and **non-viral** to dependents. All of the features you use are just as
-usable if you expose them to dependents; they don't have to depend on this
-library as well.
+This library has a common-sense ethos: be **intuitive** to use, **idiomatic** to
+write, and **non-viral** for dependents. Hence, **Ahh** tends to integrate with
+features built into the language and patterns found in the ecosystem.
 
 ## Licence
 

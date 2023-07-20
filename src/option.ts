@@ -19,10 +19,20 @@
  * @module
  */
 
+import { O } from "../mod.ts";
+
 /**
  * Returns `false`.
  *
  * It is known that `option` is a {@linkcode None} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.isSome("hello");
+ * O.isSome(NaN);
+ * ```
  */
 export function isSome(option: None): false;
 
@@ -30,6 +40,14 @@ export function isSome(option: None): false;
  * Returns `true`.
  *
  * It is known that `option` is a {@linkcode Some} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * !O.isSome(undefined);
+ * !O.isSome(none);
+ * ```
  */
 export function isSome<T>(option: Some<T>): true;
 
@@ -40,8 +58,7 @@ export function isSome<T>(option: Some<T>): true;
  * ```ts
  * import O from "./option.ts";
  *
- * O.isSome("hello");
- * O.isSome(NaN);
+ * O.isSome(prompt("age:"));
  * ```
  */
 export function isSome<T>(option: Option<T>): option is Some<T>;
@@ -54,6 +71,14 @@ export function isSome<T>(option: Option<T>): option is Some<T> {
  * Returns `true`.
  *
  * It is known that `option` is a {@linkcode None} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.isNone(undefined);
+ * O.isNone(null);
+ * ```
  */
 export function isNone(option: None): true;
 
@@ -61,6 +86,14 @@ export function isNone(option: None): true;
  * Returns `false`.
  *
  * It is known that `option` is a {@linkcode Some} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * !O.isNone("hello");
+ * !O.isNone(NaN);
+ * ```
  */
 export function isNone<T>(option: Some<T>): false;
 
@@ -71,8 +104,7 @@ export function isNone<T>(option: Some<T>): false;
  * ```ts
  * import O from "./option.ts";
  *
- * O.isNone(undefined);
- * O.isNone(null);
+ * O.isNone(prompt("age:"));
  * ```
  */
 export function isNone<T>(option: Option<T>): option is None;
@@ -85,6 +117,13 @@ export function isNone<T>(option: Option<T>): option is Some<T> {
  * Returns `option` as-is.
  *
  * It is known that `option` is a {@linkcode None} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.map(undefined, (i) => String(i));
+ * ```
  */
 export function map<T, U>(
     option: None,
@@ -96,6 +135,13 @@ export function map<T, U>(
  *
  * It is known that `option` is a {@linkcode Some} value and that `fn` returns a
  * {@linkcode Some} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.map(1, (i) => String(i));
+ * ```
  */
 export function map<T, U>(
     option: Some<T>,
@@ -106,6 +152,13 @@ export function map<T, U>(
  * Returns `fn` applied to `option`.
  *
  * It is known that `option` is a {@linkcode Some} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.map(1, (i) => Math.random() > 0.5 ? String(i) : undefined);
+ * ```
  */
 export function map<T, U>(
     option: Some<T>,
@@ -119,9 +172,7 @@ export function map<T, U>(
  * ```ts
  * import O from "./option.ts";
  *
- * O.map(undefined, (i) => String(i));
- * O.map(1, (i) => String(i));
- * O.map(1, (i) => Math.random() > 0.5 ? String(i) : undefined);
+ * O.map(prompt("age:"), (i) => Number(i));
  * ```
  */
 export function map<T, U>(

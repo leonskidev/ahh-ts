@@ -97,7 +97,10 @@ export function map<T, U>(
  * It is known that `option` is a {@linkcode Some} value and that `fn` returns a
  * {@linkcode Some} value.
  */
-export function map<T, U>(option: Some<T>, fn: (value: Some<T>) => Some<U>): Some<U>;
+export function map<T, U>(
+    option: Some<T>,
+    fn: (value: Some<T>) => Some<U>,
+): Some<U>;
 
 /**
  * Returns `fn` applied to `option`.

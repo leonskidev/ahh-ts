@@ -1,9 +1,4 @@
-import {
-  assert,
-  assertArrayIncludes,
-  assertFalse,
-  assertStrictEquals,
-} from "../test_deps.ts";
+import { assert, assertFalse, assertStrictEquals } from "../test_deps.ts";
 import O from "./option.ts";
 
 const toString = (i: number): string => i.toString();
@@ -69,68 +64,4 @@ Deno.test("map", async (t) => {
     await t.step("null", () => assert(O.isNone(O.map(null, toString))));
   });
   await t.step("some", () => assertStrictEquals(O.map(2, toString), "2"));
-});
-
-Deno.test("zip", async (t) => {
-  await t.step("none none", async (t) => {
-    await t.step(
-      "undefined undefined",
-      () => assertStrictEquals(O.zip(undefined, undefined), undefined),
-    );
-    await t.step(
-      "null undefined",
-      () => assertStrictEquals(O.zip(null, undefined), null),
-    );
-    await t.step(
-      "undefined null",
-      () => assertStrictEquals(O.zip(undefined, null), undefined),
-    );
-    await t.step(
-      "null null",
-      () => assertStrictEquals(O.zip(null, null), null),
-    );
-  });
-
-  await t.step("none some", async (t) => {
-    await t.step(
-      "undefined",
-      () => assertStrictEquals(O.zip(undefined, 2), undefined),
-    );
-    await t.step(
-      "null",
-      () => assertStrictEquals(O.zip(null, 2), null),
-    );
-  });
-
-  await t.step("some none", async (t) => {
-    await t.step(
-      "undefined",
-      () => assertStrictEquals(O.zip(2, undefined), undefined),
-    );
-    await t.step(
-      "null",
-      () => assertStrictEquals(O.zip(2, null), null),
-    );
-  });
-
-  await t.step("some some", () => {
-    const zipped = O.zip(2, 4);
-
-    assert(O.isSome(zipped));
-    assertArrayIncludes(zipped, [2, 4]);
-  });
-});
-
-Deno.test("unzip", async (t) => {
-  await t.step("none", async (t) => {
-    await t.step(
-      "undefined",
-      () => assertArrayIncludes(O.unzip(undefined), [undefined, undefined]),
-    );
-    await t.step(
-      "null",
-      () => assertArrayIncludes(O.unzip(null), [null, null]),
-    );
-  });
-  await t.step("some", () => assertArrayIncludes(O.unzip([2, 4]), [2, 4]));
 });

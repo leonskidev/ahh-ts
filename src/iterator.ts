@@ -15,7 +15,7 @@
  * @module
  */
 
-// NOTE: these are usef for documentation
+// NOTE: these are used for documentation
 // deno-lint-ignore no-unused-vars
 import type { None } from "./option.ts";
 import { default as O, Option, Some } from "./option.ts";

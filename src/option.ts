@@ -1,12 +1,16 @@
 /**
- * Optionals.
+ * Optional values.
  *
- * The {@linkcode Option} type defined here is nothing special, it's the same as
- * what the rest of the ecosystem already uses. Thanks to this, we still benefit
- * from the built-in language features for [nullish] types, such as:
+ * {@linkcode Option} defines a (non-)[nullish] value, exactly the same as how
+ * we conventionally denote optional values. This means we still have access to
+ * all off the built-in functionality that comes with [nullish] values, such as:
  *
- * - [nullish coalescing] (`??` and `??=`); and,
- * - [optional chaining] (`?.`).
+ * - [nullish coalescing] — `??` and `??=`,
+ * - [optional chaining] — `?.`,
+ * - and more.
+ *
+ * This module adds onto those features. As such, you are safe to expose these
+ * types to dependencies without them having to adapt to some new pattern.
  *
  * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
  * [nullish coalescing]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing

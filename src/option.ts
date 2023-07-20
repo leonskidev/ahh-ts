@@ -19,8 +19,6 @@
  * @module
  */
 
-import { O } from "../mod.ts";
-
 /**
  * Returns `false`.
  *

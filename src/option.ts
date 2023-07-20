@@ -47,7 +47,7 @@ export function isSome<T>(option: Some<T>): true;
 export function isSome<T>(option: Option<T>): option is Some<T>;
 
 export function isSome<T>(option: Option<T>): option is Some<T> {
-  return typeof (option) !== "undefined" && option !== null;
+    return typeof (option) !== "undefined" && option !== null;
 }
 
 /**
@@ -78,7 +78,7 @@ export function isNone<T>(option: Some<T>): false;
 export function isNone<T>(option: Option<T>): option is None;
 
 export function isNone<T>(option: Option<T>): option is Some<T> {
-  return typeof (option) === "undefined" || option === null;
+    return typeof (option) === "undefined" || option === null;
 }
 
 /**
@@ -87,8 +87,8 @@ export function isNone<T>(option: Option<T>): option is Some<T> {
  * It is known that `option` is a {@linkcode None} value.
  */
 export function map<T, U>(
-  option: None,
-  fn: (value: T) => Some<U> | Option<U>,
+    option: None,
+    fn: (value: T) => Some<U> | Option<U>,
 ): None;
 
 /**
@@ -105,8 +105,8 @@ export function map<T, U>(option: Some<T>, fn: (value: T) => Some<U>): Some<U>;
  * It is known that `option` is a {@linkcode Some} value.
  */
 export function map<T, U>(
-  option: Some<T>,
-  fn: (value: T) => Option<U>,
+    option: Some<T>,
+    fn: (value: T) => Option<U>,
 ): Option<U>;
 
 /**
@@ -122,15 +122,15 @@ export function map<T, U>(
  * ```
  */
 export function map<T, U>(
-  option: Option<T>,
-  fn: (value: T) => Some<U> | Option<U>,
+    option: Option<T>,
+    fn: (value: T) => Some<U> | Option<U>,
 ): Option<U>;
 
 export function map<T, U>(
-  option: Option<T>,
-  fn: (value: T) => Some<U> | Option<U>,
+    option: Option<T>,
+    fn: (value: T) => Some<U> | Option<U>,
 ): Option<U> {
-  return isSome(option) ? fn(option) : option;
+    return isSome(option) ? fn(option) : option;
 }
 
 export default { isSome, isNone, map };

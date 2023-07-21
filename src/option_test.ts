@@ -1,90 +1,90 @@
+import { O } from "../mod.ts";
 import {
     assert,
     assertArrayIncludes,
     assertFalse,
     assertStrictEquals,
 } from "../test_deps.ts";
-import O from "./option.ts";
-
-const toString = (i: number): string => i.toString();
 
 Deno.test("isSome", async (t) => {
-    await t.step("truthy", async (t) => {
-        await t.step("true", () => assert(O.isSome(true)));
-        await t.step("Infinity", () => assert(O.isSome(Infinity)));
-        await t.step("12.3", () => assert(O.isSome(12.3)));
-        await t.step("-12.3", () => assert(O.isSome(-12.3)));
-        await t.step("123n", () => assert(O.isSome(123n)));
-        await t.step("-123n", () => assert(O.isSome(-123n)));
-        await t.step("{}", () => assert(O.isSome({})));
+    await t.step("nullish", () => {
+        assertFalse(O.isSome(undefined));
+        assertFalse(O.isSome(null));
     });
 
-    await t.step("falsy", async (t) => {
-        await t.step("false", () => assert(O.isSome(false)));
-        await t.step("NaN", () => assert(O.isSome(NaN)));
-        await t.step("0", () => assert(O.isSome(0)));
-        await t.step("-0", () => assert(O.isSome(-0)));
-        await t.step("0n", () => assert(O.isSome(0n)));
-        await t.step('""', () => assert(O.isSome("")));
+    await t.step("falsy", () => {
+        assert(O.isSome(false));
+        assert(O.isSome(NaN));
+        assert(O.isSome(0));
+        assert(O.isSome(-0));
+        assert(O.isSome(0n));
+        assert(O.isSome(""));
+    });
 
-        await t.step("nullish", async (t) => {
-            await t.step("undefined", () => assertFalse(O.isSome(undefined)));
-            await t.step("null", () => assertFalse(O.isSome(null)));
-        });
+    await t.step("truthy", () => {
+        assert(O.isSome(true));
+        assert(O.isSome(Infinity));
+        assert(O.isSome(123));
+        assert(O.isSome(-123));
+        assert(O.isSome(123n));
+        assert(O.isSome("hello, world!"));
     });
 });
 
 Deno.test("isNone", async (t) => {
-    await t.step("truthy", async (t) => {
-        await t.step("true", () => assertFalse(O.isNone(true)));
-        await t.step("Infinity", () => assertFalse(O.isNone(Infinity)));
-        await t.step("12.3", () => assertFalse(O.isNone(12.3)));
-        await t.step("-12.3", () => assertFalse(O.isNone(-12.3)));
-        await t.step("123n", () => assertFalse(O.isNone(123n)));
-        await t.step("-123n", () => assertFalse(O.isNone(-123n)));
-        await t.step("{}", () => assertFalse(O.isNone({})));
+    await t.step("nullish", () => {
+        assert(O.isNone(undefined));
+        assert(O.isNone(null));
     });
 
-    await t.step("falsy", async (t) => {
-        await t.step("false", () => assertFalse(O.isNone(false)));
-        await t.step("NaN", () => assertFalse(O.isNone(NaN)));
-        await t.step("0", () => assertFalse(O.isNone(0)));
-        await t.step("-0", () => assertFalse(O.isNone(-0)));
-        await t.step("0n", () => assertFalse(O.isNone(0n)));
-        await t.step('""', () => assertFalse(O.isNone("")));
+    await t.step("falsy", () => {
+        assertFalse(O.isNone(false));
+        assertFalse(O.isNone(NaN));
+        assertFalse(O.isNone(0));
+        assertFalse(O.isNone(-0));
+        assertFalse(O.isNone(0n));
+        assertFalse(O.isNone(""));
+    });
 
-        await t.step("nullish", async (t) => {
-            await t.step("undefined", () => assert(O.isNone(undefined)));
-            await t.step("null", () => assert(O.isNone(null)));
-        });
+    await t.step("truthy", () => {
+        assertFalse(O.isNone(true));
+        assertFalse(O.isNone(Infinity));
+        assertFalse(O.isNone(123));
+        assertFalse(O.isNone(-123));
+        assertFalse(O.isNone(123n));
+        assertFalse(O.isNone("hello, world!"));
     });
 });
 
 Deno.test("map", async (t) => {
-    await t.step("none", () => assert(O.isNone(O.map(undefined, toString))));
-    await t.step("some", () => assertStrictEquals(O.map(0, toString), "0"));
+    await t.step("none", () => {
+        assertStrictEquals(O.map(undefined, String), undefined);
+        assertStrictEquals(O.map(123, () => null), null);
+    });
+
+    await t.step("some", () => {
+        assertStrictEquals(O.map(123, String), "123");
+    });
 });
 
 Deno.test("zip", async (t) => {
-    await t.step(
-        "none none",
-        () => assert(O.isNone(O.zip(undefined, undefined))),
-    );
-    await t.step("some none", () => assert(O.isNone(O.zip(0, undefined))));
-    await t.step("none some", () => assert(O.isNone(O.zip(undefined, 0))));
-    await t.step(
-        "some some",
-        () => assertArrayIncludes(O.zip(0, "hello"), [0, "hello"]),
-    );
-});
+    await t.step("none", () => {
+        assertStrictEquals(O.zip(undefined, null), undefined);
+        assertStrictEquals(O.zip(undefined, 123), undefined);
+        assertStrictEquals(O.zip(123, null), null);
+    });
 
+    await t.step("some", () => {
+        assertArrayIncludes(O.zip(123, "hello"), [123, "hello"]);
+    });
+});
 Deno.test("unzip", async (t) => {
-    await t.step(
-        "none",
-        () => assertArrayIncludes(O.unzip(undefined), [undefined, undefined]),
-    );
-    await t.step(
-        "some",
-        () => assertArrayIncludes(O.unzip(["hello", NaN]), ["hello", NaN]),
-    );
+    await t.step("none", () => {
+        assertArrayIncludes(O.unzip(undefined), [undefined, undefined]);
+        assertArrayIncludes(O.unzip(null), [null, null]);
+    });
+
+    await t.step("some", () => {
+        assertArrayIncludes(O.unzip([123, "hello"]), [123, "hello"]);
+    });
 });

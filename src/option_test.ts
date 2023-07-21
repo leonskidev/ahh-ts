@@ -1,4 +1,9 @@
-import { assert, assertFalse, assertStrictEquals } from "../test_deps.ts";
+import {
+    assert,
+    assertArrayIncludes,
+    assertFalse,
+    assertStrictEquals,
+} from "../test_deps.ts";
 import O from "./option.ts";
 
 const toString = (i: number): string => i.toString();
@@ -56,12 +61,30 @@ Deno.test("isNone", async (t) => {
 });
 
 Deno.test("map", async (t) => {
-    await t.step("none", async (t) => {
-        await t.step(
-            "undefined",
-            () => assert(O.isNone(O.map(undefined, toString))),
-        );
-        await t.step("null", () => assert(O.isNone(O.map(null, toString))));
-    });
-    await t.step("some", () => assertStrictEquals(O.map(2, toString), "2"));
+    await t.step("none", () => assert(O.isNone(O.map(undefined, toString))));
+    await t.step("some", () => assertStrictEquals(O.map(0, toString), "0"));
+});
+
+Deno.test("zip", async (t) => {
+    await t.step(
+        "none none",
+        () => assert(O.isNone(O.zip(undefined, undefined))),
+    );
+    await t.step("some none", () => assert(O.isNone(O.zip(0, undefined))));
+    await t.step("none some", () => assert(O.isNone(O.zip(undefined, 0))));
+    await t.step(
+        "some some",
+        () => assertArrayIncludes(O.zip(0, "hello"), [0, "hello"]),
+    );
+});
+
+Deno.test("unzip", async (t) => {
+    await t.step(
+        "none",
+        () => assertArrayIncludes(O.unzip(undefined), [undefined, undefined]),
+    );
+    await t.step(
+        "some",
+        () => assertArrayIncludes(O.unzip(["hello", NaN]), ["hello", NaN]),
+    );
 });

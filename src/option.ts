@@ -3,14 +3,14 @@
  *
  * {@linkcode Option} defines a (non-)[nullish] value, exactly the same as how
  * we conventionally denote optional values. This means we still have access to
- * all off the built-in functionality that comes with [nullish] values, such as:
+ * all of the built-in functionality that comes with [nullish] values, such as:
  *
- * - [nullish coalescing] — `??` and `??=`,
- * - [optional chaining] — `?.`,
+ * - [nullish coalescing] (`??` and `??=`),
+ * - [optional chaining] (`?.`),
  * - and more.
  *
  * This module adds onto those features. As such, you are safe to expose these
- * types to dependencies without them having to adapt to some new pattern.
+ * to dependents without them having to adapt to some new pattern.
  *
  * [nullish]: https://developer.mozilla.org/docs/Glossary/Nullish
  * [nullish coalescing]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing
@@ -44,7 +44,7 @@ export function isSome(option: None): false;
  * import O from "./option.ts";
  *
  * !O.isSome(undefined);
- * !O.isSome(none);
+ * !O.isSome(null);
  * ```
  */
 export function isSome<T>(option: Some<T>): true;
@@ -185,7 +185,118 @@ export function map<T, U>(
     return isSome(option) ? fn(option) : option;
 }
 
-export default { isSome, isNone, map };
+/**
+ * Returns `option` as-is.
+ *
+ * It is known that `option` is a {@linkcode None} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.zip(undefined, "hello");
+ * ```
+ */
+export function zip<U>(option: None, other: Option<U>): None;
+
+/**
+ * Returns `other` as-is.
+ *
+ * It is known that `other` is a {@linkcode None} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.zip("hello", undefined);
+ * ```
+ */
+export function zip<T>(option: Option<T>, other: None): None;
+
+/**
+ * Returns the values of `option` and `other` in a tuple.
+ *
+ * It is known that both `option` and `other` are {@linkcode Some} values.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.zip("hello", NaN);
+ * ```
+ */
+export function zip<T, U>(option: Some<T>, other: Some<U>): Some<[T, U]>;
+
+/**
+ * Returns the values of `option` and `other` in a tuple if both are
+ * {@linkcode Some} values.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.zip(prompt("name:"), NaN);
+ * O.zip("hello", prompt("name:"));
+ * O.zip(prompt("name:"), Math.random() > 0.5 ? "hello" : undefined);
+ * ```
+ */
+export function zip<T, U>(option: Option<T>, other: Option<U>): Option<[T, U]>;
+
+export function zip<T, U>(option: Option<T>, other: Option<U>): Option<[T, U]> {
+    return isSome(option) ? (isSome(other) ? [option, other] : other) : option;
+}
+
+/**
+ * Returns `option` as-is in a tuple.
+ *
+ * It is known that `option` is a {@linkcode None} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.unzip(undefined);
+ * ```
+ */
+export function unzip(option: None): [None, None];
+
+/**
+ * Returns the values of `option` in a tuple.
+ *
+ * It is known that both `option` is a {@linkcode Some} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.unzip(["hello", NaN]);
+ * ```
+ */
+export function unzip<T, U>(
+    option: Some<[Some<T>, Some<U>]>,
+): [Some<T>, Some<U>];
+
+/**
+ * Returns the values of `option` in a tuple if it is a {@linkcode Some} value.
+ *
+ * @example
+ * ```ts
+ * import O from "./option.ts";
+ *
+ * O.unzip(O.map(prompt("age:"), (s) => [s, NaN] satisfies [string, number]));
+ * ```
+ */
+export function unzip<T, U>(
+    option: Option<[Some<T>, Some<U>]>,
+): [Option<T>, Option<U>];
+
+export function unzip<T, U>(
+    option: Option<[Some<T>, Some<U>]>,
+): [Option<T>, Option<U>] {
+    return isSome(option) ? [option[0], option[1]] : [option, option];
+}
+
+export default { isSome, isNone, map, zip, unzip };
 
 /**
  * A value that is [nullish]; either `undefined` or `null`.

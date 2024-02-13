@@ -1,5 +1,10 @@
 <!-- deno-fmt-ignore-file -->
 
+> [!WARNING]
+> This is unlikely to be maintained anymore and will be archived henceforth. I
+> simply do not use JavaScript or TypeScript anymore, and barely used them when
+> I originally made this for fun.
+
 # Ahh
 
 **Ahh** is a collection of items that feel **idiomatic** to use and integrate
